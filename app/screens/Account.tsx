@@ -1,12 +1,10 @@
 import { ThemedText } from "@/themes/ThemedText";
 import { StyleSheet, View } from "react-native";
 
-export default function Index() {
+export default function Account() {
   return (
-    <View
-      style={styles.container}
-    >
-      <ThemedText variant="title">Recharger</ThemedText>
+    <View style={styles.container}>
+      <ThemedText variant="title">Compte</ThemedText>
     </View>
   );
 }
