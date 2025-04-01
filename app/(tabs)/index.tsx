@@ -1,12 +1,12 @@
-import MapView from 'react-native-maps';
 import { StyleSheet, View } from "react-native";
+import { Map } from '@/components/Map';
 
 export default function Index() {
   return (
     <View
       style={styles.container}
     >
-      <MapView style={styles.map} />
+      <Map />
     </View>
   );
 }
@@ -14,9 +14,5 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  map: {
-    width: '100%',
-    height: '100%',
-  },
+  }
 });
