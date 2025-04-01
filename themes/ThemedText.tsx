@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   text: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'regular',
   },
   lilText: {

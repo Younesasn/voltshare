@@ -2,10 +2,12 @@ import { Tabs } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Feather from "@expo/vector-icons/Feather";
-import { SafeAreaView, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { Colors } from "@/themes/Colors";
+import { useState } from "react";
 
 export default function TabsLayout() {
+  const [modalVisible, setModalVisible] = useState(false);
   return (
     <Tabs
       screenOptions={{
@@ -20,6 +22,24 @@ export default function TabsLayout() {
           title: "Recharger",
           tabBarLabel: "Recharger",
           tabBarIconStyle: { marginBottom: -5 },
+          tabBarStyle: {
+            position: "absolute",
+            bottom: 20,
+            width: "90%",
+            marginLeft: "5%",
+            height: 70,
+            backgroundColor: Colors["shady-50"],
+            flexDirection: "row",
+            borderBottomStartRadius: 30,
+            borderEndEndRadius: 30,
+            shadowColor: Colors["shady-950"],
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.2,
+            shadowRadius: 10,
+            elevation: 5, // Pour Android
+            paddingBottom: 5,
+            paddingTop: 5,
+          },
           tabBarLabelStyle: { fontSize: 12, fontWeight: "600", marginTop: 9 },
           tabBarIcon: () => (
             <MaterialIcons

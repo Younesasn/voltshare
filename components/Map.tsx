@@ -1,7 +1,10 @@
-import { Markers } from "@/data/Markers";
 import { Colors } from "@/themes/Colors";
-import { StyleSheet, Text, View } from "react-native";
-import MapView, { MarkerAnimated } from "react-native-maps";
+import { StyleSheet, View } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import { SearchMenu } from "./SearchMenu";
+import Octicons from "@expo/vector-icons/Octicons";
+import { ThemedText } from "@/themes/ThemedText";
+import { Bornes } from "@/data/Bornes";
 
 export function Map() {
   return (
@@ -14,24 +17,27 @@ export function Map() {
         longitudeDelta: 0.0421,
       }}
     >
-      {Markers.map((marker, key) => {
+      {Bornes.map((borne, key) => {
         return (
-          <MarkerAnimated
+          <Marker
             coordinate={{
-              latitude: marker.coordinate.latitude,
-              longitude: marker.coordinate.longitude,
+              latitude: borne.coordinate.latitude,
+              longitude: borne.coordinate.longitude,
             }}
-            title={marker.power}
-            description={marker.tarif}
+            title={borne.name}
             key={key}
           >
-            <View style={styles.marker}>
-              <Text style={styles.markerPower}>{marker.power}</Text>
-              <Text style={styles.markerTarif}>{marker.tarif}</Text>
+            <View style={styles.borne}>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 2 }}>
+                <ThemedText>{borne.power}</ThemedText>
+                <Octicons name="zap" size={12} color={Colors["shady-950"]} />
+              </View>
+              <ThemedText style={styles.markerTarif}>{borne.tarif}</ThemedText>
             </View>
-          </MarkerAnimated>
+          </Marker>
         );
       })}
+      <SearchMenu />
     </MapView>
   );
 }
@@ -41,7 +47,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  marker: {
+  borne: {
     borderRadius: 10,
     borderColor: Colors["shady-400"],
     borderWidth: 1,
@@ -50,6 +56,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 5,
     paddingHorizontal: 15,
+    // Ombre
+    shadowColor: Colors["shady-950"],
+    shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
   },
   markerPower: {
     fontSize: 14,

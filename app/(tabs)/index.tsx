@@ -1,11 +1,9 @@
 import { StyleSheet, View } from "react-native";
-import { Map } from '@/components/Map';
+import { Map } from "@/components/Map";
 
 export default function Index() {
   return (
-    <View
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <Map />
     </View>
   );
@@ -14,5 +12,11 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  }
+  },
+  button: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+  },
 });

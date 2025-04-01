@@ -1,6 +1,6 @@
-import { Pin } from "@/types/Pin";
+import { BorneType } from "@/types/BorneType";
 
-export const Markers: Pin[] = [
+export const Bornes: BorneType[] = [
   {
     coordinate: {
       latitude: 45.74519292993862,
@@ -8,6 +8,7 @@ export const Markers: Pin[] = [
     },
     power: "7.4kW",
     tarif: "4.50€/h",
+    name: "IZIVIA Grand Lyon - Vénissieux"
   },
   {
     coordinate: {
@@ -16,6 +17,7 @@ export const Markers: Pin[] = [
     },
     power: "3.7kW",
     tarif: "2.50€/h",
+    name: "Powerdot - Saint-Fons"
   },
   {
     coordinate: {
@@ -24,6 +26,7 @@ export const Markers: Pin[] = [
     },
     power: "7kW",
     tarif: "4€/h",
+    name: "IZIVIA Grand Lyon - Feyzin"
   },
   {
     coordinate: {
@@ -32,6 +35,7 @@ export const Markers: Pin[] = [
     },
     power: "2.3kW",
     tarif: "1.90€/h",
+    name: "Carrefour Vénissieux - Vénissieux"
   },
   {
     coordinate: {
@@ -40,5 +44,6 @@ export const Markers: Pin[] = [
     },
     power: "22kW",
     tarif: "5.60€/h",
+    name: "Lyon 8ème"
   },
 ];
