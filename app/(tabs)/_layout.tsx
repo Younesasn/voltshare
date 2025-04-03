@@ -4,10 +4,8 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Feather from "@expo/vector-icons/Feather";
 import { StyleSheet } from "react-native";
 import { Colors } from "@/themes/Colors";
-import { useState } from "react";
 
 export default function TabsLayout() {
-  const [modalVisible, setModalVisible] = useState(false);
   return (
     <Tabs
       screenOptions={{
@@ -34,7 +32,7 @@ export default function TabsLayout() {
             borderEndEndRadius: 30,
             shadowColor: Colors["shady-950"],
             shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.2,
+            shadowOpacity: 0.1,
             shadowRadius: 10,
             elevation: 5, // Pour Android
             paddingBottom: 5,
@@ -85,7 +83,6 @@ export default function TabsLayout() {
           tabBarLabel: "Compte",
           tabBarIconStyle: { marginBottom: -5 },
           tabBarLabelStyle: { fontSize: 12, fontWeight: "600", marginTop: 9 },
-          tabBarStyle: { position: "absolute" },
           tabBarIcon: () => (
             <MaterialIcons
               name="account-circle"

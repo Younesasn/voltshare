@@ -27,7 +27,7 @@ export default function Borne({ borne }: { borne: BorneType }) {
           </View>
         </View>
       </View>
-      <Button link={'../add-borne'} title="Choisir" />
+      <Button link={'./borne-details/[id]'} title="Choisir" id={borne.id} />
     </View>
   );
 }

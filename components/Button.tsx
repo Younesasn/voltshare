@@ -5,12 +5,20 @@ import { StyleSheet } from "react-native";
 export default function Button({
   link,
   title,
+  id,
 }: {
   link: ExternalPathString | RelativePathString;
   title: string;
+  id?: number;
 }) {
   return (
-    <Link href={link} style={style.button}>
+    <Link
+      href={{
+        pathname: link,
+        params: { id: id }
+      }}
+      style={style.button}
+    >
       {title}
     </Link>
   );

@@ -5,6 +5,7 @@ import { SearchMenu } from "./SearchMenu";
 import Octicons from "@expo/vector-icons/Octicons";
 import { ThemedText } from "@/themes/ThemedText";
 import { Bornes } from "@/data/Bornes";
+import { Link } from "expo-router";
 
 export function Map() {
   return (
@@ -27,13 +28,15 @@ export function Map() {
             title={borne.name}
             key={key}
           >
-            <View style={styles.borne}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 2 }}>
-                <ThemedText>{borne.power}</ThemedText>
-                <Octicons name="zap" size={12} color={Colors["shady-950"]} />
+            <Link href={`./borne-details/${borne.id}`}>
+              <View style={styles.borne}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 2 }}>
+                  <ThemedText>{borne.power}</ThemedText>
+                  <Octicons name="zap" size={12} color={Colors["shady-950"]} />
+                </View>
+                <ThemedText style={styles.markerTarif}>{borne.tarif}</ThemedText>
               </View>
-              <ThemedText style={styles.markerTarif}>{borne.tarif}</ThemedText>
-            </View>
+            </Link>
           </Marker>
         );
       })}
