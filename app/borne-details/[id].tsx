@@ -1,6 +1,5 @@
 import { Link, useLocalSearchParams } from "expo-router";
-import { Image } from "expo-image";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Image } from "react-native";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import { Bornes } from "@/data/Bornes";
@@ -8,19 +7,22 @@ import Entypo from "@expo/vector-icons/Entypo";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Button from "@/components/Button";
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useState } from "react";
 
 export default function BorneDetails() {
   const { id } = useLocalSearchParams();
   const newId = parseInt(id as string);
   const borne = Bornes.find((b) => b.id === newId);
 
+  const [isStarred, setIsStarred] = useState(false);
+
   return (
     <View style={styles.container}>
       {/* Image */}
       <Image
         style={styles.image}
-        source={{ uri: borne?.image }}
-        
+        src={borne?.image}
+        alt="image test"
       />
       {/* Retour Button */}
       <Link href={"../"} style={styles.backButton}>
@@ -39,7 +41,11 @@ export default function BorneDetails() {
               <ThemedText variant="lilText">2.9km</ThemedText>
             </View>
           </View>
-          <Entypo name="star-outlined" size={24} color={Colors["shady-950"]} />
+          {isStarred ? (
+            <Entypo name="star" onPress={() => setIsStarred(false)} size={24} color={Colors["shady-950"]} />
+          ) : (
+            <Entypo name="star-outlined" onPress={() => setIsStarred(true)} size={24} color={Colors["shady-950"]} />
+          )}
         </View>
 
         <ThemedText variant="lilText">{borne?.description}</ThemedText>
@@ -83,7 +89,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   image: {
-    backgroundColor: Colors["shady-950"],
+    // backgroundColor: Colors["shady-950"],
     width: "100%",
     height: 300,
   },
