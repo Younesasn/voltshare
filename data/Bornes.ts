@@ -13,7 +13,7 @@ export const Bornes: BorneType[] = [
     address: "1 rue de la République",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
     type: "Type 2",
-    image: "./assets/images/borne.avif"
+    image: "https://picsum.photos/seed/696/3000/2000"
   },
   {
     id: 2,
@@ -27,7 +27,7 @@ export const Bornes: BorneType[] = [
     address: "1 rue de la République",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
     type: "Type 2",
-    image: "./assets/images/borne.avif"
+    image: "https://picsum.photos/seed/696/3000/2000"
   },
   {
     id: 3,
@@ -41,7 +41,7 @@ export const Bornes: BorneType[] = [
     address: "1 rue de la République",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
     type: "Type 2",
-    image: "./assets/images/borne.avif"
+    image: "https://picsum.photos/seed/696/3000/2000"
   },
   {
     id: 4,
@@ -55,7 +55,7 @@ export const Bornes: BorneType[] = [
     address: "1 rue de la République",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
     type: "Type 2",
-    image: "./assets/images/borne.avif"
+    image: "https://picsum.photos/seed/696/3000/2000"
   },
   {
     id: 5,
@@ -69,6 +69,6 @@ export const Bornes: BorneType[] = [
     address: "1 rue de la République",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
     type: "Type 2",
-    image: "./assets/images/borne.avif"
+    image: "https://picsum.photos/seed/696/3000/2000"
   },
 ];
