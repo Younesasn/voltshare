@@ -1,15 +1,23 @@
 import { Colors } from "@/themes/Colors";
-import { ExternalPathString, Link, RelativePathString } from "expo-router";
-import { StyleSheet } from "react-native";
+import { ThemedText } from "@/themes/ThemedText";
+import {
+  ExternalPathString,
+  Link,
+  Redirect,
+  RelativePathString,
+} from "expo-router";
+import { StyleProp, StyleSheet, TouchableOpacity } from "react-native";
 
 export default function Button({
   link,
   title,
   id,
+  style,
 }: {
   link: ExternalPathString | RelativePathString;
   title: string;
   id?: number;
+  style?: StyleProp<any>;
 }) {
   return (
     <Link
@@ -17,14 +25,14 @@ export default function Button({
         pathname: link,
         params: { id: id }
       }}
-      style={style.button}
+      style={[styles.button, style]}
     >
       {title}
     </Link>
   );
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   button: {
     paddingVertical: 10,
     backgroundColor: Colors["shady-950"],

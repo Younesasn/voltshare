@@ -1,5 +1,5 @@
 import { Link, useLocalSearchParams } from "expo-router";
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, ScrollView } from "react-native";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import { Bornes } from "@/data/Bornes";
@@ -21,7 +21,7 @@ export default function BorneDetails() {
       {/* Image */}
       <Image
         style={styles.image}
-        src={borne?.image}
+        source={require("../../assets/images/borne.avif")}
         alt="image test"
       />
       {/* Retour Button */}
@@ -29,7 +29,7 @@ export default function BorneDetails() {
         <Ionicons name="arrow-back-outline" size={24} color={Colors["shady-950"]} />
       </Link>
 
-      <View style={styles.content}>
+      <ScrollView style={styles.content}>
         <View style={styles.contentTitle}>
           <View>
             <ThemedText variant="title">{borne?.name}</ThemedText>
@@ -48,9 +48,9 @@ export default function BorneDetails() {
           )}
         </View>
 
-        <ThemedText variant="lilText">{borne?.description}</ThemedText>
+        <ThemedText variant="lilText" style={{marginBottom: 20}}>{borne?.description}</ThemedText>
 
-        <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 20 }}>
           <MaterialCommunityIcons name="ev-plug-type2" size={40} color={Colors["shady-950"]} />
           <View style={{ display: "flex", flexDirection: "row", gap: 4, alignItems: "center" }}>
             <View>
@@ -70,10 +70,10 @@ export default function BorneDetails() {
             <View style={{width: 8, height: 8, borderRadius: 5, backgroundColor: "#39E930"}} />
             <ThemedText variant="lilText">Disponible</ThemedText>
           </View>
-          <Button link="../(tabs)/" title="Réserver" />
+          <Button link="../choice-date/" title="Réserver" />
         </View>
         {/* <View style={{ height: 900, width: "100%", backgroundColor: "red", display: "flex" }} /> */}
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -89,20 +89,19 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   image: {
-    // backgroundColor: Colors["shady-950"],
     width: "100%",
     height: 300,
   },
   content: {
-    flex: 1,
-    width: "100%",
+    display: "flex",
+    flexDirection: "column",
     padding: 20,
-    gap: 20,
   },
   contentTitle: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingBottom: 20,
   },
   backButton: { 
     backgroundColor: Colors["shady-50"], 
