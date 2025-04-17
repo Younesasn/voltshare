@@ -1,7 +1,7 @@
 import { useAuth } from "@/context/AuthContext";
-import { Redirect, Stack, Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import React from "react";
-import { StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Feather from "@expo/vector-icons/Feather";
@@ -9,9 +9,20 @@ import { Colors } from "@/themes/Colors";
 
 export default function AppLayout() {
   const { authState } = useAuth();
-  return !authState?.authenticated ? (
-    <Redirect href={"/login"} />
-  ) : (
+
+  if (authState?.authenticated === null) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color={Colors["shady-950"]} />
+      </View>
+    );
+  }
+
+  if (!authState?.authenticated) {
+    return <Redirect href="/login" />;
+  }
+
+  return (
     <Tabs
       screenOptions={{
         headerShown: false,

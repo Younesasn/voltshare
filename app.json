@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "voltshare-auth",
-    "slug": "voltshare-auth",
+    "name": "voltshare",
+    "slug": "voltshare",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

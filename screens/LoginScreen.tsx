@@ -4,98 +4,199 @@ import { ThemedText } from "@/themes/ThemedText";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  Dimensions,
   Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useForm, Controller } from "react-hook-form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Button from "@/components/Button";
+
+const schema = z.object({
+  email: z
+    .string()
+    .min(1, {
+      message: "Email requis",
+    })
+    .email({ message: "Email invalide" }),
+  password: z.string().min(1, { message: "Mot de passe requis" }),
+});
+const screenWidth = Dimensions.get("window").width;
+type LoginFormValues = z.infer<typeof schema>;
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { onLogin, authState } = useAuth();
+  const { onLogin } = useAuth();
   const router = useRouter();
 
-  const login = async () => {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const login = async ({ email, password }: LoginFormValues) => {
     try {
       setIsLoading(true);
-      await onLogin!(email, password);
+      const result = await onLogin!(email, password);
+      if (result.error) {
+        setIsLoading(false);
+        setLoginError("Email ou mot de passe incorrect");
+        return;
+      }
       setIsLoading(false);
       router.navigate("/twoFA");
     } catch (error: any) {
+      setIsLoading(false);
       console.log({ errorLogin: error.message });
+      setLoginError("Une erreur est survenue, veuillez réessayer.");
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* <Image
-        source={require("../../assets/images/icon.png")}
-        style={styles.image}
-      /> */}
-      <Text>Connectez-vous</Text>
-      <ThemedText>
-        Connecté ? : {authState?.authenticated ? "Oui" : "Non"}
-      </ThemedText>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Image
+            source={require("../assets/images/borne.avif")}
+            style={styles.image}
+          />
 
-      <View style={{ display: "flex", width: "100%", padding: 20 }}>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={(text: string) => setEmail(text)}
-          placeholder="Email"
-        />
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={(text: string) => setPassword(text)}
-          secureTextEntry={true}
-          placeholder="Mot de passe"
-        />
-        {isLoading ? (
-          <ThemedText>Connexion en cours...</ThemedText>
-        ) : (
-          <TouchableOpacity onPress={login}>
-            <ThemedText>Se connecter</ThemedText>
-          </TouchableOpacity>
-        )}
-      </View>
-    </SafeAreaView>
+          <View style={styles.content}>
+            <View>
+              <ThemedText variant="title">Se connecter</ThemedText>
+            </View>
+            <View style={{ flexDirection: "column", gap: 10 }}>
+              <Controller
+                control={control}
+                name="email"
+                rules={{ required: true }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={styles.input}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    placeholder="Email"
+                    placeholderTextColor={Colors["shady-900"]}
+                  />
+                )}
+              />
+              {errors.email && (
+                <Text style={styles.error}>{errors.email.message}</Text>
+              )}
+            </View>
+            <View style={{ flexDirection: "column", gap: 10 }}>
+              <Controller
+                control={control}
+                name="password"
+                rules={{ required: true }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={styles.input}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    placeholder="Mot de passe"
+                    placeholderTextColor={Colors["shady-900"]}
+                    secureTextEntry
+                  />
+                )}
+              />
+              {errors.password && (
+                <Text style={styles.error}>{errors.password.message}</Text>
+              )}
+            </View>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
+              }}
+            >
+              {loginError && <Text style={styles.error}>{loginError}</Text>}
+              <Button
+                title="Se connecter"
+                onPress={handleSubmit(login)}
+                isLoading={isLoading}
+              />
+              <TouchableOpacity
+                onPress={() => router.navigate("/register")}
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 4,
+                }}
+              >
+                <ThemedText>Vous n'avez pas de compte ?</ThemedText>
+                <ThemedText style={{ textDecorationLine: "underline" }}>
+                  Inscrivez-vous
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors["shady-50"],
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
     width: "100%",
     height: "100%",
   },
   image: {
-    width: 100,
-    height: 100,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    width: screenWidth,
+    height: 300,
+    alignSelf: "stretch",
+  },
+  content: {
+    height: "50%",
+    width: "100%",
+    padding: 20,
+    gap: 30,
+    display: "flex",
+    justifyContent: "center",
   },
   input: {
     borderColor: Colors["shady-900"],
     borderWidth: 1,
-    height: 40,
-    marginBottom: 20,
+    height: 50,
     borderRadius: 6,
     padding: 10,
+  },
+  error: {
+    color: "red",
   },
 });

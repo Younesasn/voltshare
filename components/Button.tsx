@@ -1,12 +1,13 @@
-import { Colors } from "@/themes/Colors";
-import { ThemedText } from "@/themes/ThemedText";
 import {
-  ExternalPathString,
-  Link,
-  Redirect,
-  RelativePathString,
-} from "expo-router";
-import { StyleProp, StyleSheet, TouchableOpacity } from "react-native";
+  ActivityIndicator,
+  StyleProp,
+  StyleSheet,
+  TouchableOpacity,
+  ViewStyle,
+} from "react-native";
+import { ThemedText } from "@/themes/ThemedText";
+import { Colors } from "@/themes/Colors";
+import { ExternalPathString, Link, RelativePathString } from "expo-router";
 
 export default function Button({
   link,
@@ -14,26 +15,42 @@ export default function Button({
   id,
   style,
   onPress,
+  isLoading = false,
+  disabled = false,
 }: {
   link?: ExternalPathString | RelativePathString;
   title: string;
   id?: number;
-  style?: StyleProp<any>;
+  style?: StyleProp<ViewStyle>;
   onPress?: () => any;
+  isLoading?: boolean;
+  disabled?: boolean;
 }) {
-  return link ? (
-    <Link
-      href={{
-        pathname: link,
-        params: { id: id },
-      }}
-      style={[styles.button, style]}
+  const buttonStyles = [
+    styles.button,
+    style,
+    (isLoading || disabled) && styles.disabled,
+  ];
+
+  if (link) {
+    return (
+      <Link href={{ pathname: link, params: { id } }} style={buttonStyles}>
+        {title}
+      </Link>
+    );
+  }
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={buttonStyles}
+      disabled={isLoading || disabled}
     >
-      {title}
-    </Link>
-  ) : (
-    <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
-      <ThemedText color={Colors["shady-50"]}>{title}</ThemedText>
+      {isLoading ? (
+        <ActivityIndicator color={Colors["shady-50"]} />
+      ) : (
+        <ThemedText color={Colors["shady-50"]}>{title}</ThemedText>
+      )}
     </TouchableOpacity>
   );
 }
@@ -44,6 +61,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors["shady-950"],
     borderRadius: 8,
     paddingHorizontal: 15,
-    color: Colors["shady-50"],
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  disabled: {
+    opacity: 0.6,
   },
 });
