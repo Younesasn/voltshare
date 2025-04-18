@@ -71,7 +71,7 @@ export default function RegisterScreen() {
       });
       if (result.error) {
         setIsLoading(false);
-        setRegisterError("Une erreur est survenue, veuillez réessayer.");
+        setRegisterError(result.message);
         return;
       }
       setIsLoading(false);
@@ -252,6 +252,9 @@ export default function RegisterScreen() {
                   justifyContent: "center",
                 }}
               >
+                {registerError && (
+                  <ThemedText style={styles.error}>{registerError}</ThemedText>
+                )}
                 <Button
                   title="Créer un compte"
                   onPress={handleSubmit(register)}

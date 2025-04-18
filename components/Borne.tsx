@@ -3,10 +3,10 @@ import { ThemedText } from "@/themes/ThemedText";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { StyleSheet, View } from "react-native";
 import Octicons from '@expo/vector-icons/Octicons';
-import { BorneType } from "@/types/BorneType";
 import Button from "./Button";
+import { Station } from "@/interfaces/Station";
 
-export default function Borne({ borne }: { borne: BorneType }) {
+export default function station({ station }: { station: Station }) {
   return (
     <View style={styles.container}>
       <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 10 }}>
@@ -16,18 +16,18 @@ export default function Borne({ borne }: { borne: BorneType }) {
           color={Colors["shady-950"]}
         />
         <View>
-          <ThemedText variant="text">{borne.name}</ThemedText>
+          <ThemedText variant="text">{station.name}</ThemedText>
           <View
             style={{ flexDirection: "row", alignItems: "center" }}
           >
-            <ThemedText variant="text" style={{marginEnd: 2, color: Colors["shady-700"]}}>{borne.power}</ThemedText>
+            <ThemedText variant="text" style={{marginEnd: 2, color: Colors["shady-700"]}}>{station.power}kW</ThemedText>
             <Octicons name="zap" size={12} color={Colors["shady-700"]} />
             <ThemedText variant="text"> - </ThemedText>
             <ThemedText variant="text">3.2km</ThemedText>
           </View>
         </View>
       </View>
-      <Button link={'./borne-details/[id]'} title="Choisir" id={borne.id} />
+      <Button link={'./borne-details/[id]'} title="Choisir" id={station.id} />
     </View>
   );
 }

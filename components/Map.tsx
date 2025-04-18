@@ -1,13 +1,38 @@
 import { Colors } from "@/themes/Colors";
-import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { SearchMenu } from "./SearchMenu";
 import Octicons from "@expo/vector-icons/Octicons";
 import { ThemedText } from "@/themes/ThemedText";
-import { Bornes } from "@/data/Bornes";
 import { Link } from "expo-router";
+import { getAllStations } from "@/services/StationService";
+import { useEffect, useState } from "react";
+import { Station } from "@/interfaces/Station";
 
 export function Map() {
+  const [stations, setStations] = useState<Station[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    getAllStations()
+      .then((res) => {
+        setStations(res.data.member);
+      })
+      .catch((err) => {
+        console.error("Erreur lors du chargement des bornes :", err.message);
+        Alert.alert("Erreur", "Impossible de récupérer les bornes.");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors["shady-700"]} />
+      </View>
+    );
+  }
+
   return (
     <MapView
       style={styles.map}
@@ -18,12 +43,12 @@ export function Map() {
         longitudeDelta: 0.0421,
       }}
     >
-      {Bornes.map((borne, key) => {
+      {stations.map((borne, key) => {
         return (
           <Marker
             coordinate={{
-              latitude: borne.coordinate.latitude,
-              longitude: borne.coordinate.longitude,
+              latitude: borne.latitude,
+              longitude: borne.longitude,
             }}
             title={borne.name}
             key={key}
@@ -31,16 +56,16 @@ export function Map() {
             <Link href={`./borne-details/${borne.id}`}>
               <View style={styles.borne}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 2 }}>
-                  <ThemedText>{borne.power}</ThemedText>
+                  <ThemedText>{borne.power}kW</ThemedText>
                   <Octicons name="zap" size={12} color={Colors["shady-950"]} />
                 </View>
-                <ThemedText style={styles.markerTarif}>{borne.tarif}</ThemedText>
+                <ThemedText style={styles.markerTarif}>{borne.price}€/h</ThemedText>
               </View>
             </Link>
           </Marker>
         );
       })}
-      <SearchMenu />
+      <SearchMenu stations={stations} />
     </MapView>
   );
 }
@@ -49,6 +74,11 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: "100%",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   borne: {
     borderRadius: 10,

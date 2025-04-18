@@ -1,20 +1,36 @@
-import { Link, useLocalSearchParams } from "expo-router";
-import { View, StyleSheet, Image, ScrollView } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import {
+  View,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
-import { Bornes } from "@/data/Bornes";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Button from "@/components/Button";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Station } from "@/interfaces/Station";
+import { getStationById } from "@/services/StationService";
 
 export default function BorneDetailsScreen() {
   const { id } = useLocalSearchParams();
   const newId = parseInt(id as string);
-  const borne = Bornes.find((b) => b.id === newId);
-
+  const [station, setStation] = useState<Station | null>(null);
   const [isStarred, setIsStarred] = useState(false);
+
+  useEffect(() => {
+    getStationById(newId).then((res) => {
+      setStation(res.data);
+    }).catch((err) => {
+      console.error("Erreur lors de la récupération du station :", err.message);
+      Alert.alert("Erreur", "Impossible de récupérer les informations.");
+    });
+  }, [newId]);
 
   return (
     <View style={styles.container}>
@@ -25,24 +41,24 @@ export default function BorneDetailsScreen() {
         alt="image test"
       />
       {/* Retour Button */}
-      <Link href={"../"} style={styles.backButton}>
+      <TouchableOpacity style={styles.back} onPress={() => router.back()}>
         <Ionicons
           name="arrow-back-outline"
           size={24}
-          color={Colors["shady-950"]}
+          color={Colors["shady-900"]}
         />
-      </Link>
+      </TouchableOpacity>
 
       <ScrollView style={styles.content}>
         <View style={styles.contentTitle}>
           <View>
             <View style={{ width: 360 }}>
-              <ThemedText variant="title">{borne?.name}</ThemedText>
+              <ThemedText variant="title">{station?.name}</ThemedText>
             </View>
             <View
               style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
             >
-              <ThemedText variant="lilText">{borne?.address}</ThemedText>
+              <ThemedText variant="lilText">{station?.adress}</ThemedText>
               <ThemedText variant="lilText">•</ThemedText>
               <ThemedText variant="lilText">2.9km</ThemedText>
             </View>
@@ -65,7 +81,7 @@ export default function BorneDetailsScreen() {
         </View>
 
         <ThemedText variant="lilText" style={{ marginBottom: 20 }}>
-          {borne?.description}
+          {station?.description}
         </ThemedText>
 
         <View
@@ -91,12 +107,12 @@ export default function BorneDetailsScreen() {
             }}
           >
             <View>
-              <ThemedText>{borne?.type}</ThemedText>
-              <ThemedText variant="lilText">{borne?.power}</ThemedText>
+              <ThemedText>{station?.type}</ThemedText>
+              <ThemedText variant="lilText">{station?.power}kW</ThemedText>
             </View>
             <ThemedText variant="lilText">•</ThemedText>
             <View>
-              <ThemedText>{borne?.tarif}</ThemedText>
+              <ThemedText>{station?.price}€/h</ThemedText>
               <ThemedText variant="lilText">prix</ThemedText>
             </View>
           </View>
@@ -136,6 +152,18 @@ export default function BorneDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
+  back: {
+    backgroundColor: Colors["shady-50"],
+    borderColor: Colors["shady-900"],
+    borderWidth: 1,
+    position: "absolute",
+    top: 60,
+    left: 20,
+    padding: 5,
+    borderRadius: 20,
+    zIndex: 90,
+    elevation: 10,
+  },
   container: {
     position: "absolute",
     backgroundColor: Colors["shady-50"],

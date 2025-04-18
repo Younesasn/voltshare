@@ -29,5 +29,5 @@ type Props = TextProps & {
 };
 
 export function ThemedText({ variant, color, ...rest }: Props) {
-  return <Text style={[styles[variant ?? 'text'], { color }]} {...rest} />;
+  return <Text style={[styles[variant ?? 'text'], { color, fontFamily: 'Uber' }]} {...rest} />;
 };

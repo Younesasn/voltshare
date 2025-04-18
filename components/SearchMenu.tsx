@@ -1,13 +1,13 @@
 import { Colors } from "@/themes/Colors";
 import { FlatList, StyleSheet, TextInput, View } from "react-native";
 import Borne from "./Borne";
-import { Bornes } from "@/data/Bornes";
+import { Station } from "@/interfaces/Station";
 
-export function SearchMenu() {
+export function SearchMenu({stations}: {stations: Station[]}) {
   return (
     <View style={styles.container}>
       <TextInput placeholder="Rechercher un lieu..." style={styles.input} />
-      <FlatList data={Bornes} renderItem={({item}) => <Borne borne={item} />} />
+      <FlatList data={stations} renderItem={({item}) => <Borne station={item} />} />
     </View>
   );
 }

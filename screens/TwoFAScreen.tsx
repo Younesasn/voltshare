@@ -107,7 +107,9 @@ export default function TwoFAScreen() {
             {errors.code && (
               <Text style={styles.error}>{errors.code.message}</Text>
             )}
-            {twoFaError && <Text style={styles.error}>{twoFaError}</Text>}
+            {twoFaError && (
+              <ThemedText style={styles.error}>{twoFaError}</ThemedText>
+            )}
             <Button
               title="Valider"
               onPress={handleSubmit(twoFa)}

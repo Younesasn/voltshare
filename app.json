@@ -27,6 +27,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-secure-store",
       [
         "expo-splash-screen",
         {
@@ -36,7 +37,12 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-secure-store"
+      [
+        "expo-font",
+        {
+          "fonts": ["./assets/fonts/UberMove-Regular.ttf"]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

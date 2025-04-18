@@ -106,7 +106,9 @@ export default function LoginScreen() {
                 )}
               />
               {errors.email && (
-                <Text style={styles.error}>{errors.email.message}</Text>
+                <ThemedText style={styles.error}>
+                  {errors.email.message}
+                </ThemedText>
               )}
             </View>
             <View style={{ flexDirection: "column", gap: 10 }}>
@@ -127,7 +129,9 @@ export default function LoginScreen() {
                 )}
               />
               {errors.password && (
-                <Text style={styles.error}>{errors.password.message}</Text>
+                <ThemedText style={styles.error}>
+                  {errors.password.message}
+                </ThemedText>
               )}
             </View>
             <View
@@ -139,7 +143,9 @@ export default function LoginScreen() {
                 gap: 10,
               }}
             >
-              {loginError && <Text style={styles.error}>{loginError}</Text>}
+              {loginError && (
+                <ThemedText style={styles.error}>{loginError}</ThemedText>
+              )}
               <Button
                 title="Se connecter"
                 onPress={handleSubmit(login)}
