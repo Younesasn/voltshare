@@ -3,9 +3,9 @@ import { Redirect, Tabs } from "expo-router";
 import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Feather from "@expo/vector-icons/Feather";
 import { Colors } from "@/themes/Colors";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 export default function AppLayout() {
   const { authState } = useAuth();
@@ -65,18 +65,14 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="add/index"
+        name="message/index"
         options={{
-          title: "Ajouter",
-          tabBarLabel: "Ajouter",
+          title: "Messagerie",
+          tabBarLabel: "Messagerie",
           tabBarIconStyle: { marginBottom: -5 },
           tabBarLabelStyle: { fontSize: 12, fontWeight: "600", marginTop: 9 },
           tabBarIcon: () => (
-            <FontAwesome5
-              name="charging-station"
-              size={28}
-              color={Colors["shady-950"]}
-            />
+            <AntDesign name="message1" size={24} color={Colors["shady-950"]} />
           ),
         }}
       />
