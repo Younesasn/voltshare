@@ -198,18 +198,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const token = await SecureStore.getItemAsync(TOKEN_KEY);
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      await axios.patch(`${apiUrl}/api/users/${id}`, {
-        firstname: userUpdated.firstname ?? user?.firstname,
-        lastname: userUpdated.lastname ?? user?.lastname,
-        email: userUpdated.email ?? user?.email,
-        adress: userUpdated.adress ?? user?.adress,
-        tel: userUpdated.tel ?? user?.tel,
-        avatar: userUpdated.avatar ?? user?.avatar,
-      }, {
-        headers: {'Content-Type': 'application/merge-patch+json'},
-      });
+      return await axios.patch(
+        `${apiUrl}/api/users/${id}`,
+        {
+          firstname: userUpdated.firstname ?? user?.firstname,
+          lastname: userUpdated.lastname ?? user?.lastname,
+          email: userUpdated.email ?? user?.email,
+          adress: userUpdated.adress ?? user?.adress,
+          tel: userUpdated.tel ?? user?.tel,
+        },
+        {
+          headers: { "Content-Type": "application/merge-patch+json" },
+        }
+      );
+    } catch (error: any) {
+      return { error: true, message: error.message };
+    }
+  };
 
-    } catch (error: any) {}
+  const onRefreshing = async () => {
+    try {
+      const token = await SecureStore.getItemAsync(TOKEN_KEY);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      const result = await axios.get(`${apiUrl}/api/me`);
+      setUser(result.data);
+      return { error: false };
+    } catch (error: any) {
+      return { error: true, message: error.message };
+    }
   };
 
   const logout = async () => {
@@ -297,6 +313,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         onDeleteAccount,
         onUpdating,
+        onRefreshing,
       }}
     >
       {children}

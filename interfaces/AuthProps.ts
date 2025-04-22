@@ -9,4 +9,5 @@ export interface AuthProps {
   user?: User;
   onDeleteAccount?: (id: any) => Promise<any>;
   onUpdating?: (id: any, userUpdated: UserRegister) => Promise<any>;
+  onRefreshing?: () => Promise<any>;
 }

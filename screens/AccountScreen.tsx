@@ -4,7 +4,6 @@ import { ThemedText } from "@/themes/ThemedText";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import {
   Alert,
-  Button,
   FlatList,
   Image,
   ScrollView,
@@ -16,15 +15,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import moment from "moment";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { useState } from "react";
-import * as ImagePicker from "expo-image-picker";
+import { useEffect, useState } from "react";
+import { router } from "expo-router";
 
 moment.locale("fr");
 
 export default function AccountScreen() {
-  const [image, setImage] = useState<string | null>(null);
   const apiUrl = `${process.env.EXPO_PUBLIC_API_URL}/images/`;
-  const { onLogout, user, onDeleteAccount, onUpdating } = useAuth();
+  const { onLogout, user, onDeleteAccount } = useAuth();
   const deleteAccount = () => {
     if (!user?.id || !onDeleteAccount) return;
     Alert.alert(
@@ -40,21 +38,6 @@ export default function AccountScreen() {
       ]
     );
   };
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: "images",
-      quality: 1,
-    });
-    console.log(result.assets[0].fileName);
-    if (result.canceled || result.assets[0].fileName === null) {
-      console.log("Vous avez annulé l'image");
-      return;
-    }
-    setImage(result.assets[0].uri as string);
-    onUpdating(user?.id, { avatar: result.assets[0].fileName as string });
-  };
-
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -79,7 +62,6 @@ export default function AccountScreen() {
               }
               style={styles.image}
             />
-            <Button title="🖍️" onPress={pickImage} />
             <View>
               <ThemedText variant="title">
                 {user?.firstname} {user?.lastname}
@@ -91,29 +73,39 @@ export default function AccountScreen() {
             <MaterialIcons name="logout" size={24} color="black" />
           </TouchableOpacity>
         </View>
-        <ScrollView style={{ paddingVertical: 20 }}>
-          <View>
-            <ThemedText variant="title">Mes voitures</ThemedText>
-            <FlatList
-              scrollEnabled={false}
-              data={user?.cars}
-              renderItem={({ item }) => (
-                <TouchableOpacity style={styles.buttonCar}>
-                  <ThemedText>{item.model}</ThemedText>
-                  <Ionicons
-                    name="car-sport-sharp"
-                    size={40}
-                    color={Colors["shady-950"]}
-                  />
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item) => item.id.toString()}
-              style={{ paddingVertical: 20 }}
-            />
-            <TouchableOpacity style={styles.buttonCar}>
-              <ThemedText>Ajouter une voiture</ThemedText>
-              <AntDesign name="plus" size={40} color={Colors["shady-950"]} />
-            </TouchableOpacity>
+        <ScrollView>
+          <View style={{ paddingVertical: 20, gap: 20 }}>
+            <View style={{ gap: 10 }}>
+              <ThemedText variant="title">Informations Personnelles</ThemedText>
+              <TouchableOpacity
+                onPress={() => router.navigate("/informations-form")}
+              >
+                <ThemedText>Modifier mes informations</ThemedText>
+              </TouchableOpacity>
+            </View>
+            <View>
+              <ThemedText variant="title">Mes voitures</ThemedText>
+              <FlatList
+                scrollEnabled={false}
+                data={user?.cars}
+                renderItem={({ item }) => (
+                  <TouchableOpacity style={styles.buttonCar}>
+                    <ThemedText>{item.model}</ThemedText>
+                    <Ionicons
+                      name="car-sport-sharp"
+                      size={40}
+                      color={Colors["shady-950"]}
+                    />
+                  </TouchableOpacity>
+                )}
+                keyExtractor={(item) => item.id.toString()}
+                style={{ paddingVertical: 20 }}
+              />
+              <TouchableOpacity style={styles.buttonCar}>
+                <ThemedText>Ajouter une voiture</ThemedText>
+                <AntDesign name="plus" size={40} color={Colors["shady-950"]} />
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
         {/* Footer */}
