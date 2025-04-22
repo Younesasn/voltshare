@@ -1,6 +1,6 @@
 import { Colors } from "@/themes/Colors";
 import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, MarkerAnimated, Region } from "react-native-maps";
 import { SearchMenu } from "./SearchMenu";
 import Octicons from "@expo/vector-icons/Octicons";
 import { ThemedText } from "@/themes/ThemedText";
@@ -8,12 +8,34 @@ import { Link } from "expo-router";
 import { getAllStations } from "@/services/StationService";
 import { useEffect, useState } from "react";
 import { Station } from "@/interfaces/Station";
+import * as Location from "expo-location";
 
 export function Map() {
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null
+  );
+  // const [region, setRegion] = useState<Region>({
+  //   latitude: location?.coords.latitude ?? 45.7621171125936,
+  //   longitude: location?.coords.longitude ?? 4.877936294844991,
+  //   latitudeDelta: 0.0922,
+  //   longitudeDelta: 0.0421,
+  // });
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    async function getLocation() {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    }
+
     getAllStations()
       .then((res) => {
         setStations(res.data.member);
@@ -23,6 +45,7 @@ export function Map() {
         Alert.alert("Erreur", "Impossible de récupérer les bornes.");
       })
       .finally(() => setLoading(false));
+    getLocation();
   }, []);
 
   if (loading) {
@@ -37,12 +60,18 @@ export function Map() {
     <MapView
       style={styles.map}
       initialRegion={{
-        latitude: 45.7621171125936,
-        longitude: 4.877936294844991,
+        latitude: location?.coords.latitude ?? 45.7621171125936,
+        longitude: location?.coords.longitude ?? 4.87793629484499,
         latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
+        longitudeDelta: 0.0421
       }}
     >
+      <MarkerAnimated
+        title={"Vous êtes ici"}
+        coordinate={{
+          latitude: location?.coords.latitude ?? 45.7621171125936,
+          longitude: location?.coords.longitude ?? 4.877936294844991,
+        }} />
       {stations.map((borne, key) => {
         return (
           <Marker
@@ -55,11 +84,20 @@ export function Map() {
           >
             <Link href={`./borne-details/${borne.id}`}>
               <View style={styles.borne}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 2 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                >
                   <ThemedText>{borne.power}kW</ThemedText>
                   <Octicons name="zap" size={12} color={Colors["shady-950"]} />
                 </View>
-                <ThemedText style={styles.markerTarif}>{borne.price}€/h</ThemedText>
+                <ThemedText style={styles.markerTarif}>
+                  {borne.price}€/h
+                </ThemedText>
               </View>
             </Link>
           </Marker>
@@ -94,6 +132,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 2, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
+  },
+  position: {
+    backgroundColor: Colors["shady-50"],
   },
   markerPower: {
     fontSize: 14,

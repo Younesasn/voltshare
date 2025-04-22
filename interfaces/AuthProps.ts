@@ -7,4 +7,6 @@ export interface AuthProps {
   on2FA?: (code: number) => Promise<any>;
   onLogout?: () => Promise<any>;
   user?: User;
+  onDeleteAccount?: (id: any) => Promise<any>;
+  onUpdating?: (id: any, userUpdated: UserRegister) => Promise<any>;
 }

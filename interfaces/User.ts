@@ -10,6 +10,7 @@ export interface User extends ApiResponse {
   email: string;
   password: string;
   adress: string;
+  avatar?: string;
   roles: string[];
   tel: string;
   cars?: Car[];
@@ -20,10 +21,12 @@ export interface User extends ApiResponse {
 }
 
 export interface UserRegister {
-  firstname: string;
-  lastname: string;
-  email: string;
-  password: string;
-  adress: string;
-  tel: string;
+  firstname?: string;
+  lastname?: string;
+  email?: string;
+  password?: string;
+  adress?: string;
+  tel?: string;
+  avatar?: string;
+  isDeleted?: boolean;
 }

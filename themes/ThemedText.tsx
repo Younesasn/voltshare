@@ -2,11 +2,11 @@ import { StyleSheet, Text, type TextProps } from 'react-native';
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
   },
   text: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'regular',
   },
   lilText: {
@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     fontWeight: 'regular',
   },
   logo: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
   },
   placeholder: {

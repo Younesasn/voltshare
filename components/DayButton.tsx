@@ -12,8 +12,8 @@ export default function DayButton({
   letterDay: string;
   numberDay: number;
   index: number;
-  selectedId: number;
-  onPress: (index: number) => void;
+  selectedId?: number;
+  onPress?: (index: number) => void;
 }) {
   const isSelected = selectedId === index;
 
@@ -21,7 +21,7 @@ export default function DayButton({
     <View style={styles.day}>
       <ThemedText variant="lilText">{letterDay}</ThemedText>
       <TouchableOpacity
-        onPress={() => onPress(index)}
+        onPress={() => onPress && onPress(index)}
         style={[
           styles.dayButton,
           {

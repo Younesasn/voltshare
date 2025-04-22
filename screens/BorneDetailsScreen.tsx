@@ -144,7 +144,7 @@ export default function BorneDetailsScreen() {
             />
             <ThemedText variant="lilText">Disponible</ThemedText>
           </View>
-          <Button link="../choice-date/" title="Réserver" />
+          <Button link="./choice-date/[id]" title="Réserver" id={station?.id} />
         </View>
       </ScrollView>
     </View>

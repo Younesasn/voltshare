@@ -12,6 +12,7 @@ import { User, UserRegister } from "@/interfaces/User";
 import * as dayjs from "dayjs";
 import "dayjs/locale/fr";
 import Toast from "react-native-toast-message";
+import { createRandomString } from "@/utils/createRandomString";
 dayjs.locale("fr");
 
 const TOKEN_KEY = "token";
@@ -133,15 +134,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     tel,
   }: UserRegister) => {
     try {
-      await axios.post(`${apiUrl}/api/users`, {
+      await axios.post<UserRegister>(`${apiUrl}/api/users`, {
         firstname,
         lastname,
         email,
         password,
         adress,
         tel,
+        isDeleted: false,
       });
-      return login(email, password);
+      return login(email as string, password as string);
     } catch (error: any) {
       return { error: true, message: error.message };
     }
@@ -159,20 +161,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const on2FA = async (code: number) => {
+  const on2FA = async (code: number | undefined) => {
     try {
       const result = await axios.post(`${apiUrl}/2fa/check`, { code });
       const token = result.data.token;
       const refreshToken = result.data.refresh_token;
       const expiresAt = String(result.data.refresh_token_expiration);
-      console.log({ expiresAtBefore: result.data.refresh_token_expiration });
       if (!token) {
         return { error: true, message: "Code invalide" };
       }
       console.log({
         token: token,
         refresh: refreshToken,
-        expiresAtAfter: expiresAt,
+        expiresAt: expiresAt,
       });
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       const loginDate = new Date().toISOString();
@@ -193,6 +194,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const onUpdating = async (id: any, userUpdated: UserRegister) => {
+    try {
+      const token = await SecureStore.getItemAsync(TOKEN_KEY);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      await axios.patch(`${apiUrl}/api/users/${id}`, {
+        firstname: userUpdated.firstname ?? user?.firstname,
+        lastname: userUpdated.lastname ?? user?.lastname,
+        email: userUpdated.email ?? user?.email,
+        adress: userUpdated.adress ?? user?.adress,
+        tel: userUpdated.tel ?? user?.tel,
+        avatar: userUpdated.avatar ?? user?.avatar,
+      }, {
+        headers: {'Content-Type': 'application/merge-patch+json'},
+      });
+
+    } catch (error: any) {}
+  };
+
   const logout = async () => {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
     axios.defaults.headers.common["Authorization"] = "";
@@ -207,6 +226,66 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const onDeleteAccount = async (id: any) => {
+    try {
+      console.log("🔨 Suppression du compte...");
+
+      // Assure que le token est présent
+      const token = await SecureStore.getItemAsync(TOKEN_KEY);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      const anonymeUser: UserRegister = {
+        firstname: "Anonyme",
+        lastname: "Utilisateur",
+        email: "anonyme@anonyme.com",
+        password: createRandomString(12),
+        adress: "Anonyme",
+        tel: "0000000000",
+        isDeleted: true,
+      };
+
+      await axios.patch(`${apiUrl}/api/users/${id}`, anonymeUser, {
+        headers: {
+          "Content-Type": "application/merge-patch+json",
+        },
+      });
+      console.log("✅ Utilisateur supprimé");
+
+      await SecureStore.deleteItemAsync(TOKEN_KEY);
+      await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+      await SecureStore.deleteItemAsync(EXPIRES_AT_KEY);
+      await SecureStore.deleteItemAsync("loggedAt");
+      console.log("🧹 Tokens supprimés");
+
+      setAuthState({ token: null, authenticated: false });
+      console.log("🔓 Déconnecté");
+
+      Toast.show({
+        type: "success",
+        text1: "Compte supprimé",
+        text2: "Votre compte a été supprimé avec succès.",
+        position: "top",
+        visibilityTime: 4000,
+      });
+
+      return { error: false };
+    } catch (error: any) {
+      console.error("❌ Erreur lors de la suppression :", error);
+
+      Toast.show({
+        type: "error",
+        text1: "Erreur",
+        text2:
+          error?.response?.data?.message ||
+          "Impossible de supprimer le compte.",
+        position: "top",
+        visibilityTime: 5000,
+      });
+
+      return { error: true, message: error.message };
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -216,6 +295,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         onLogout: logout,
         authState,
         user,
+        onDeleteAccount,
+        onUpdating,
       }}
     >
       {children}
