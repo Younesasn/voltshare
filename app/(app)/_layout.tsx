@@ -36,24 +36,6 @@ export default function AppLayout() {
           title: "Recharger",
           tabBarLabel: "Recharger",
           tabBarIconStyle: { marginBottom: -5 },
-          tabBarStyle: {
-            position: "absolute",
-            bottom: 20,
-            width: "90%",
-            marginLeft: "5%",
-            height: 70,
-            backgroundColor: Colors["shady-50"],
-            flexDirection: "row",
-            borderBottomStartRadius: 30,
-            borderEndEndRadius: 30,
-            shadowColor: Colors["shady-950"],
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.1,
-            shadowRadius: 10,
-            elevation: 5, // Pour Android
-            paddingBottom: 5,
-            paddingTop: 5,
-          },
           tabBarLabelStyle: { fontSize: 12, fontWeight: "600", marginTop: 9 },
           tabBarIcon: () => (
             <MaterialIcons

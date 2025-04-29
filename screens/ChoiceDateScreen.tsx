@@ -1,133 +1,4 @@
-// export default function ChoiceDateScreen() {
-//   const [selectedId, setSelectedId] = useState<number>(0);
-
-//   return (
-//     <View style={styles.container}>
-//       <SafeAreaView style={styles.topBar}>
-//         <ThemedText variant="title">Voltshare</ThemedText>
-//         <TouchableOpacity>
-//           <Link href={"../"}>
-//             <Entypo name="cross" size={24} color="black" />
-//           </Link>
-//         </TouchableOpacity>
-//       </SafeAreaView>
-
-//       <View style={styles.dateContain}>
-//         <View style={styles.month}>
-//           <AntDesign name="caretleft" size={24} color="black" />
-//           <ThemedText variant="text">Mars</ThemedText>
-//           <AntDesign name="caretright" size={24} color="black" />
-//         </View>
-
-//         <FlatList
-//           data={[
-//             { day: "L", number: 1 },
-//             { day: "M", number: 2 },
-//             { day: "M", number: 3 },
-//             { day: "J", number: 4 },
-//             { day: "V", number: 5 },
-//             { day: "S", number: 6 },
-//             { day: "D", number: 7 },
-//           ]}
-//           renderItem={({ item, index }) => (
-//             <DayButton
-//               letterDay={item.day}
-//               numberDay={item.number}
-//               index={index}
-//               selectedId={selectedId}
-//               onPress={setSelectedId}
-//             />
-//           )}
-//           style={{ paddingVertical: 5 }}
-//           horizontal={true}
-//           showsHorizontalScrollIndicator={false}
-//         />
-
-//         <ScrollView style={{ height: 620 }}>
-//           <View
-//             style={{
-//               width: "100%",
-//               display: "flex",
-//               flexDirection: "row",
-//               justifyContent: "space-between",
-//               alignItems: "center",
-//             }}
-//           >
-//             <View style={{ gap: 10 }}>
-//               {hours.map((hour, index) => (
-//                 <TouchableOpacity
-//                   style={[
-//                     styles.hourButton,
-//                     {
-//                       backgroundColor: Colors["shady-50"],
-//                       borderWidth: 1,
-//                       borderColor: Colors["shady-300"],
-//                     },
-//                   ]}
-//                   key={index}
-//                 >
-//                   <ThemedText>Disponible</ThemedText>
-//                   <ThemedText>{`De ${Number(hour)} à ${
-//                     Number(hour) + 1
-//                   }`}</ThemedText>
-//                 </TouchableOpacity>
-//               ))}
-//             </View>
-//           </View>
-//         </ScrollView>
-//       </View>
-
-//       <Button link="../" title="Continuer" style={styles.button} />
-//     </View>
-//   );
-// }
-
-// export const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: "white",
-//   },
-//   topBar: {
-//     backgroundColor: Colors["shady-50"],
-//     width: "100%",
-//     display: "flex",
-//     flexDirection: "row",
-//     alignItems: "flex-end",
-//     justifyContent: "space-between",
-//     paddingHorizontal: 20,
-//   },
-//   month: {
-//     display: "flex",
-//     flexDirection: "row",
-//     alignItems: "center",
-//     justifyContent: "space-between",
-//     gap: 4,
-//   },
-//   dateContain: {
-//     gap: 25,
-//     paddingVertical: 20,
-//     paddingHorizontal: 30,
-//   },
-//   carouselDay: {},
-//   hourButton: {
-//     width: "100%",
-//     height: 50,
-//     display: "flex",
-//     flexDirection: "row",
-//     alignItems: "flex-end",
-//     justifyContent: "space-between",
-//     paddingHorizontal: 20,
-//     paddingBottom: 10,
-//     borderRadius: 10,
-//   },
-//   button: {
-//     position: "absolute",
-//     bottom: 30,
-//     right: 30,
-//   },
-// });
-
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect, MutableRefObject } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -260,7 +131,7 @@ export default function ChoiceDateScreen() {
   useEffect(() => {
     console.log(days[1]);
     console.log(getDayOfWeek(days[1]));
-  }, [newId, days]);  
+  }, [newId, days]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -272,7 +143,7 @@ export default function ChoiceDateScreen() {
         <View style={styles.picker}>
           <Swiper
             index={1}
-            ref={swiper}
+            ref={swiper as MutableRefObject<any>}
             loop={false}
             showsPagination={false}
             onIndexChanged={(id) => {
@@ -285,7 +156,7 @@ export default function ChoiceDateScreen() {
 
               setTimeout(() => {
                 setWeek(week + index);
-                swiper.current.scrollTo(1, false);
+                swiper.current?.scrollTo(1, false);
               }, 10);
             }}
           >
@@ -335,7 +206,7 @@ export default function ChoiceDateScreen() {
 
         <Swiper
           index={1}
-          ref={contentSwiper}
+          ref={contentSwiper as MutableRefObject<any>}
           loop={false}
           showsPagination={false}
           onIndexChanged={(ind) => {
@@ -354,7 +225,7 @@ export default function ChoiceDateScreen() {
               }
 
               setValue(nextValue.toDate());
-              contentSwiper.current.scrollTo(1, false);
+              contentSwiper.current?.scrollTo(1, false);
             }, 10);
           }}
         >
@@ -378,24 +249,29 @@ export default function ChoiceDateScreen() {
                     }}
                   >
                     <View style={{ gap: 10 }}>
-                      {hours.map((hour, index) => (
-                        <TouchableOpacity
-                          style={[
-                            styles.hourButton,
-                            {
-                              backgroundColor: Colors["shady-50"],
-                              borderWidth: 1,
-                              borderColor: Colors["shady-300"],
-                            },
-                          ]}
-                          key={index}
-                        >
-                          <ThemedText>Disponible</ThemedText>
-                          <ThemedText>{`De ${moment().hour(Number(hour)).hour()}h à ${
-                            moment().hour(Number(hour)).hour() + 1
-                          }h`}</ThemedText>
-                        </TouchableOpacity>
-                      ))}
+                      {hours.map((hour, index) => {
+                        const h = Number(hour);
+                        const nextHour = (h + 1) % 24;
+                        const formatHour = (n: number) =>
+                          n.toString().padStart(2, "0");
+
+                        return (
+                          <TouchableOpacity
+                            style={[
+                              styles.hourButton,
+                              {
+                                backgroundColor: Colors["shady-50"],
+                                borderWidth: 1,
+                                borderColor: Colors["shady-300"],
+                              },
+                            ]}
+                            key={index}
+                          >
+                            <ThemedText>Disponible</ThemedText>
+                            <ThemedText>{`De ${formatHour(h)}h à ${formatHour(nextHour)}h`}</ThemedText>
+                          </TouchableOpacity>
+                        );
+                      })}
                     </View>
                   </View>
                 </ScrollView>

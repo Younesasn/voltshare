@@ -31,7 +31,7 @@ type TwoFAFormValues = z.infer<typeof schema>;
 
 export default function TwoFAScreen() {
   const router = useRouter();
-  const { on2FA } = useAuth();
+  const { on2FA, onRefreshing } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [twoFaError, setTwoFaError] = useState<string | null>(null);
 
@@ -55,8 +55,14 @@ export default function TwoFAScreen() {
         setTwoFaError("Code invalide");
         return;
       }
+      const refreshResult = await onRefreshing!();
+      if (refreshResult?.error) {
+        setIsLoading(false);
+        setTwoFaError("Impossible de charger l'utilisateur");
+        return;
+      }
       setIsLoading(false);
-      router.navigate("/(app)");
+      router.replace("/(app)");
     } catch (error: any) {
       setIsLoading(false);
       console.log({ errorTwoFa: error.message });

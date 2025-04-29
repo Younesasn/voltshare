@@ -11,7 +11,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -62,7 +61,7 @@ export default function LoginScreen() {
         return;
       }
       setIsLoading(false);
-      router.navigate("/twoFA");
+      router.replace("/twoFA");
     } catch (error: any) {
       setIsLoading(false);
       console.log({ errorLogin: error.message });
