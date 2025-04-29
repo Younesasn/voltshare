@@ -3,6 +3,7 @@ import { SplashScreen, Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import Toast from "react-native-toast-message";
+import { StatusBar } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,10 +26,13 @@ export default function RootLayout() {
     <>
       <AuthProvider>
         <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(app)" />
+          <Stack.Screen name="(app)" options={{ gestureEnabled: false }} />
+          <Stack.Screen name="addCar" options={{ presentation: "transparentModal" }} />
+          <Stack.Screen name="login" options={{ animation: "none" }} />
         </Stack>
       </AuthProvider>
       <Toast />
+      <StatusBar animated translucent barStyle="dark-content"  />
     </>
   );
 }

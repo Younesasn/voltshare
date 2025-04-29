@@ -11,6 +11,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -97,120 +98,126 @@ export default function InformationsFormScreen() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <SafeAreaView style={styles.container}>
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
-            <ThemedText variant="title">Modifier mes informations</ThemedText>
-            <View style={styles.inputContain}>
-              <View style={{ gap: 20 }}>
-                <ThemedText>Identité</ThemedText>
-                <Controller
-                  control={control}
-                  name="firstname"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Prénom"
-                      placeholderTextColor={Colors["shady-900"]}
-                    />
+          <ScrollView>
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <ThemedText variant="title">Modifier mes informations</ThemedText>
+              <View style={styles.inputContain}>
+                <View style={{ gap: 20 }}>
+                  <ThemedText>Identité</ThemedText>
+                  <Controller
+                    control={control}
+                    name="firstname"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Prénom"
+                        placeholderTextColor={Colors["shady-900"]}
+                      />
+                    )}
+                  />
+                  {errors.firstname && (
+                    <Text style={styles.error}>{errors.firstname.message}</Text>
                   )}
-                />
-                {errors.firstname && (
-                  <Text style={styles.error}>{errors.firstname.message}</Text>
-                )}
-                <Controller
-                  control={control}
-                  name="lastname"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Nom"
-                      placeholderTextColor={Colors["shady-900"]}
-                    />
+                  <Controller
+                    control={control}
+                    name="lastname"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Nom"
+                        placeholderTextColor={Colors["shady-900"]}
+                      />
+                    )}
+                  />
+                  {errors.lastname && (
+                    <Text style={styles.error}>{errors.lastname.message}</Text>
                   )}
-                />
-                {errors.lastname && (
-                  <Text style={styles.error}>{errors.lastname.message}</Text>
-                )}
-              </View>
-              <View style={{ gap: 20 }}>
-                <View style={{ gap: 8 }}>
-                  <ThemedText>Email</ThemedText>
-                  <ThemedText>
-                    Votre email sera utilisé pour vous connecter et pour envoyer
-                    des notifications.
-                  </ThemedText>
                 </View>
-                <Controller
-                  control={control}
-                  name="email"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Email"
-                      placeholderTextColor={Colors["shady-900"]}
-                    />
+                <View style={{ gap: 20 }}>
+                  <View style={{ gap: 8 }}>
+                    <ThemedText>Email</ThemedText>
+                    <ThemedText>
+                      Votre email sera utilisé pour vous connecter et pour
+                      envoyer des notifications.
+                    </ThemedText>
+                  </View>
+                  <Controller
+                    control={control}
+                    name="email"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Email"
+                        placeholderTextColor={Colors["shady-900"]}
+                      />
+                    )}
+                  />
+                  {errors.email && (
+                    <Text style={styles.error}>{errors.email.message}</Text>
                   )}
-                />
-                {errors.email && (
-                  <Text style={styles.error}>{errors.email.message}</Text>
-                )}
-              </View>
-              <View style={{ gap: 20 }}>
-                <ThemedText>Adresse de facturation</ThemedText>
-                <Controller
-                  control={control}
-                  name="adress"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Adresse"
-                      placeholderTextColor={Colors["shady-900"]}
-                    />
+                </View>
+                <View style={{ gap: 20 }}>
+                  <ThemedText>Adresse de facturation</ThemedText>
+                  <Controller
+                    control={control}
+                    name="adress"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Adresse"
+                        placeholderTextColor={Colors["shady-900"]}
+                      />
+                    )}
+                  />
+                  {errors.adress && (
+                    <Text style={styles.error}>{errors.adress.message}</Text>
                   )}
-                />
-                {errors.adress && (
-                  <Text style={styles.error}>{errors.adress.message}</Text>
-                )}
-              </View>
-              <View style={{ gap: 20 }}>
-                <ThemedText>Numéro de téléphone</ThemedText>
-                <Controller
-                  control={control}
-                  name="tel"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Téléphone"
-                      placeholderTextColor={Colors["shady-900"]}
-                      keyboardType="numeric"
-                    />
+                </View>
+                <View style={{ gap: 20 }}>
+                  <ThemedText>Numéro de téléphone</ThemedText>
+                  <Controller
+                    control={control}
+                    name="tel"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Téléphone"
+                        placeholderTextColor={Colors["shady-900"]}
+                        keyboardType="numeric"
+                      />
+                    )}
+                  />
+                  {errors.tel && (
+                    <Text style={styles.error}>{errors.tel.message}</Text>
                   )}
-                />
-                {errors.tel && (
-                  <Text style={styles.error}>{errors.tel.message}</Text>
-                )}
+                </View>
               </View>
             </View>
-          </View>
+          </ScrollView>
           <View style={styles.footer}>
             <TouchableOpacity
               onPress={() => router.back()}
