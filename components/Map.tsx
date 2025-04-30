@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Keyboard,
   StyleSheet,
   Text,
   TextInput,
@@ -50,6 +51,7 @@ export function Map() {
       address: "",
     },
   });
+  const delta = 0.0421;
 
   const refreshStations = async () => {
     try {
@@ -79,8 +81,8 @@ export function Map() {
         {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
-          latitudeDelta: 0.0422,
-          longitudeDelta: 0.0421,
+          latitudeDelta: delta,
+          longitudeDelta: delta,
         },
         1000
       );
@@ -98,8 +100,8 @@ export function Map() {
           {
             latitude: coords[1],
             longitude: coords[0],
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
+            latitudeDelta: delta,
+            longitudeDelta: delta,
           },
           1000
         );
@@ -144,35 +146,73 @@ export function Map() {
   }
 
   return (
-    <MapView
-      ref={mapRef}
-      showsUserLocation={true}
-      userInterfaceStyle="light"
-      style={styles.map}
-      initialRegion={{
-        latitude: location?.coords.latitude ?? 45.7621171125936,
-        longitude: location?.coords.longitude ?? 4.87793629484499,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      }}
-    >
-      {searchCoords && (
-        <Marker
-          coordinate={{
-            latitude: searchCoords[1],
-            longitude: searchCoords[0],
-          }}
-          title="Recherche"
-          key="recherche"
-        />
-      )}
-      <SafeAreaView>
+    <View style={{ flex: 1 }}>
+      <MapView
+        ref={mapRef}
+        showsUserLocation={true}
+        userInterfaceStyle="light"
+        style={styles.map}
+        initialRegion={{
+          latitude: location?.coords.latitude ?? 45.7621171125936,
+          longitude: location?.coords.longitude ?? 4.87793629484499,
+          latitudeDelta: delta,
+          longitudeDelta: delta,
+        }}
+      >
+        {searchCoords && (
+          <Marker
+            coordinate={{
+              latitude: searchCoords[1],
+              longitude: searchCoords[0],
+            }}
+            title="Recherche"
+            key="recherche"
+          />
+        )}
+        {stations?.map((borne, key) => {
+          return (
+            <Marker
+              coordinate={{
+                latitude: borne.latitude,
+                longitude: borne.longitude,
+              }}
+              title={borne.name}
+              key={key}
+            >
+              <Link href={`./borne-details/${borne.id}`}>
+                <View style={styles.borne}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 2,
+                    }}
+                  >
+                    <ThemedText>{borne.power}kW</ThemedText>
+                    <Octicons
+                      name="zap"
+                      size={12}
+                      color={Colors["shady-950"]}
+                    />
+                  </View>
+                  <ThemedText style={styles.markerTarif}>
+                    {borne.price}€/h
+                  </ThemedText>
+                </View>
+              </Link>
+            </Marker>
+          );
+        })}
+      </MapView>
+
+      <SafeAreaView style={{ position: "absolute", width: "100%" }}>
         <View
           style={{
-            padding: 10,
             marginHorizontal: 10,
-            borderRadius: 15,
+            padding: 10,
             backgroundColor: Colors["shady-50"],
+            borderRadius: 15,
           }}
         >
           <View style={styles.input}>
@@ -189,7 +229,7 @@ export function Map() {
                   value={value}
                   placeholder="Rechercher un lieu..."
                   placeholderTextColor={Colors["shady-900"]}
-                  style={{ width: "90%" }}
+                  style={{ width: "90%", height: 40 }}
                 />
               )}
             />
@@ -197,20 +237,15 @@ export function Map() {
               <MaterialIcons name="search" size={30} color="black" />
             </TouchableOpacity>
           </View>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              paddingHorizontal: 4,
-              gap: 20,
-            }}
-          >
+
+          {searchResult && (
             <FlatList
-              data={searchResult}
               scrollEnabled={false}
+              data={searchResult}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={() => {
+                    Keyboard.dismiss();
                     const [lon, lat] = item.geometry.coordinates;
                     setSearchCoords([lon, lat]);
                     setSearchResult(null);
@@ -220,8 +255,8 @@ export function Map() {
                         {
                           latitude: lat,
                           longitude: lon,
-                          latitudeDelta: 0.0922,
-                          longitudeDelta: 0.0421,
+                          latitudeDelta: delta,
+                          longitudeDelta: delta,
                         },
                         1000
                       );
@@ -237,15 +272,31 @@ export function Map() {
                 </TouchableOpacity>
               )}
             />
-          </View>
+          )}
         </View>
+        <TouchableOpacity
+          onPress={getLocation}
+          style={{
+            marginHorizontal: 15,
+            marginTop: 15,
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
+          }}
+        >
+          <FontAwesome6
+            name="location-arrow"
+            size={34}
+            color={Colors["shady-950"]}
+          />
+        </TouchableOpacity>
       </SafeAreaView>
-      {/* Bouton de rafraichissement  /  Bouton de localisation */}
-      <View
+
+      {/* <View
         style={{
-          display: "flex",
+          // position: "absolute",
+          width: "100%",
           flexDirection: "row",
-          alignItems: "center",
           justifyContent: "space-between",
           paddingHorizontal: 20,
         }}
@@ -264,40 +315,8 @@ export function Map() {
             color={Colors["shady-950"]}
           />
         </TouchableOpacity>
-      </View>
-
-      {stations?.map((borne, key) => {
-        return (
-          <Marker
-            coordinate={{
-              latitude: borne.latitude,
-              longitude: borne.longitude,
-            }}
-            title={borne.name}
-            key={key}
-          >
-            <Link href={`./borne-details/${borne.id}`}>
-              <View style={styles.borne}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: 2,
-                  }}
-                >
-                  <ThemedText>{borne.power}kW</ThemedText>
-                  <Octicons name="zap" size={12} color={Colors["shady-950"]} />
-                </View>
-                <ThemedText style={styles.markerTarif}>
-                  {borne.price}€/h
-                </ThemedText>
-              </View>
-            </Link>
-          </Marker>
-        );
-      })}
-    </MapView>
+      </View> */}
+    </View>
   );
 }
 
