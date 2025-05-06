@@ -1,8 +1,7 @@
+import { apiUrl } from "@/context/AuthContext";
 import { ApiListResponse } from "@/interfaces/ApiListResponse";
 import { Station } from "@/interfaces/Station";
 import axios from "axios";
-
-const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 export function getAllStations() {
   return axios.get<ApiListResponse<Station>>(`${apiUrl}/api/stations`);

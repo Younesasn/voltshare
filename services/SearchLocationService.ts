@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const apiUrl = process.env.EXPO_PUBLIC_ADRESSE_API;
+const apiLocation = process.env.EXPO_PUBLIC_ADRESSE_API;
 
-type Location = {
+export type Location = {
   type: string;
   version: string;
   features: {
@@ -38,5 +38,5 @@ type Location = {
 export function searchLocation(query: string) {
   const array = query.split(" ");
   const newQuery = array.join("+");
-  return axios.get<Location>(`${apiUrl}/search/?q=${newQuery}`);
+  return axios.get<Location>(`${apiLocation}/search/?q=${newQuery}`);
 }
