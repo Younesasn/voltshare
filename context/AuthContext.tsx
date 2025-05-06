@@ -48,12 +48,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const lastLogin = new Date(loggedAt);
-      const diffInMinutes = Math.floor(
-        (now.getTime() - lastLogin.getTime()) / 60000
+      const diffInSeconds = Math.floor(
+        (now.getTime() - lastLogin.getTime()) / 1000
       );
-
       console.log(
-        `⏱️ Temps écoulé depuis la connexion : ${diffInMinutes} minutes`
+        `⏱️ Temps écoulé depuis la connexion : ${diffInSeconds} secondes`
       );
 
       // Vérifie si le refresh token est dépassé
@@ -74,8 +73,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      // Si plus de 40min se sont écoulées → on tente de refresh le token
-      if (diffInMinutes > 40) {
+      // Si plus d'1min se sont écoulées → on tente de refresh le token
+      if (diffInSeconds > 59) {
         try {
           console.log("🔁 Token expiré, tentative de refresh...");
           const result = await axios.post(`${apiUrl}/api/token/refresh`, {
@@ -170,11 +169,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!token) {
         return { error: true, message: "Code invalide" };
       }
-      console.log({
-        token: token,
-        refresh: refreshToken,
-        expiresAt: expiresAt,
-      });
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       const loginDate = new Date().toISOString();
       await SecureStore.setItemAsync("loggedAt", loginDate);
@@ -230,6 +224,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
+    await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+    await SecureStore.deleteItemAsync(EXPIRES_AT_KEY);
+    await SecureStore.deleteItemAsync("loggedAt");
     axios.defaults.headers.common["Authorization"] = "";
     setAuthState({ token: null, authenticated: false });
     Toast.show({
