@@ -45,6 +45,7 @@ export function Map() {
     control,
     handleSubmit,
     formState: { errors },
+    setValue
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -112,7 +113,7 @@ export function Map() {
   };
 
   const fetchSearchSuggestions = async (query: string) => {
-    if (!query || query.length < 8) {
+    if (!query || query.length < 4) {
       setSearchResult(null);
       return;
     }
@@ -120,7 +121,7 @@ export function Map() {
     try {
       const res = await searchLocation(query);
       const features = res.data.features.slice(0, 4);
-      setSearchResult(features);
+      setSearchResult(features as any);
     } catch (error) {
       console.error("Erreur de recherche :", error);
       setSearchResult(null);
@@ -242,11 +243,12 @@ export function Map() {
             <FlatList
               scrollEnabled={false}
               data={searchResult}
-              renderItem={({ item }) => (
+              renderItem={(item: any) => (
                 <TouchableOpacity
                   onPress={() => {
                     Keyboard.dismiss();
                     const [lon, lat] = item.geometry.coordinates;
+                    setValue("address", item.properties.label);
                     setSearchCoords([lon, lat]);
                     setSearchResult(null);
 
