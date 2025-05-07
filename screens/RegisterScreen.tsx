@@ -252,14 +252,20 @@ export default function RegisterScreen() {
                   justifyContent: "center",
                 }}
               >
-                {registerError && (
-                  <ThemedText style={styles.error}>{registerError}</ThemedText>
-                )}
-                <Button
-                  title="Créer un compte"
-                  onPress={handleSubmit(register)}
-                  isLoading={isLoading}
-                />
+                <View
+                  style={{ display: "flex", gap: 20, alignItems: "center" }}
+                >
+                  {registerError && (
+                    <ThemedText style={styles.error}>
+                      {registerError}
+                    </ThemedText>
+                  )}
+                  <Button
+                    title="Créer un compte"
+                    onPress={handleSubmit(register)}
+                    isLoading={isLoading}
+                  />
+                </View>
               </View>
             </View>
           </View>
