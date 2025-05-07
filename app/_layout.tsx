@@ -27,7 +27,7 @@ export default function RootLayout() {
       <AuthProvider>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(app)" options={{ gestureEnabled: false }} />
-          <Stack.Screen name="addCar" options={{ presentation: "transparentModal" }} />
+          <Stack.Screen name="add-car" options={{ presentation: "transparentModal" }} />
           <Stack.Screen name="login" options={{ animation: "none" }} />
         </Stack>
       </AuthProvider>

@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/AuthContext";
+import { apiUrl, useAuth } from "@/context/AuthContext";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -7,6 +7,7 @@ import {
   Alert,
   FlatList,
   Image,
+  Modal,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -25,9 +26,10 @@ import Toast from "react-native-toast-message";
 moment.locale("fr");
 
 export default function AccountScreen() {
-  const apiUrl = `${process.env.EXPO_PUBLIC_API_URL}/images/`;
+  const url = `${apiUrl}/images/`;
   const { onLogout, user, onDeleteAccount, onRefreshing } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalStationVisible, setIsModalStationVisible] = useState(false);
 
   const deleteAccount = () => {
     if (!user?.id || !onDeleteAccount) return;
@@ -120,7 +122,7 @@ export default function AccountScreen() {
           >
             <Image
               src={
-                user?.avatar ? apiUrl + user?.avatar : apiUrl + "avatar.avif"
+                user?.avatar ? url + user?.avatar : url + "avatar.avif"
               }
               style={styles.image}
             />
@@ -177,7 +179,7 @@ export default function AccountScreen() {
                 ))}
               <TouchableOpacity
                 style={styles.buttonCar}
-                onPress={() => router.navigate("/addCar")}
+                onPress={() => router.navigate("/add-car")}
               >
                 <ThemedText>Ajouter une voiture</ThemedText>
                 <AntDesign name="plus" size={40} color={Colors["shady-950"]} />
@@ -214,7 +216,7 @@ export default function AccountScreen() {
               )}
               <TouchableOpacity
                 style={styles.buttonCar}
-                onPress={() => console.log("salut")}
+                onPress={() => router.navigate("/add-station")}
               >
                 <ThemedText>Ajouter une borne</ThemedText>
                 <AntDesign name="plus" size={40} color={Colors["shady-950"]} />
@@ -247,6 +249,18 @@ export default function AccountScreen() {
         </ScrollView>
         {/* Footer */}
       </View>
+      {/* Modal Station */}
+      {/* <Modal
+        visible={isModalStationVisible}
+        transparent={true}
+        animationType="fade"
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            
+          </View>
+        </View>
+      </Modal> */}
     </SafeAreaView>
   );
 }
@@ -282,5 +296,35 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingLeft: 20,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: Colors["shady-50"],
+    padding: 20,
+    borderRadius: 20,
+    width: "80%",
+    maxWidth: 400,
+  },
+  modalButtons: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
+  },
+  modalButton: {
+    backgroundColor: Colors["shady-950"],
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
