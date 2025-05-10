@@ -45,7 +45,7 @@ export function Map() {
     control,
     handleSubmit,
     formState: { errors },
-    setValue
+    setValue,
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -74,7 +74,7 @@ export function Map() {
       return;
     }
 
-    const location = await Location.getCurrentPositionAsync({});
+    const location = await Location.getCurrentPositionAsync();
     setLocation(location);
 
     if (mapRef.current) {
@@ -107,8 +107,12 @@ export function Map() {
           1000
         );
       }
-    } catch (error) {
-      console.error("Erreur lors de la recherche :", error);
+    } catch (error: any) {
+      if (error.response) {
+        console.error("Erreur de recherche :", error.response.data);
+      } else {
+        console.error("Erreur de recherche :", error.message);
+      }
     }
   };
 
@@ -120,7 +124,7 @@ export function Map() {
 
     try {
       const res = await searchLocation(query);
-      const features = res.data.features.slice(0, 4);
+      const features = res.data.features;
       setSearchResult(features as any);
     } catch (error) {
       console.error("Erreur de recherche :", error);
@@ -243,7 +247,10 @@ export function Map() {
             <FlatList
               scrollEnabled={false}
               data={searchResult}
-              renderItem={(item: any) => (
+              keyExtractor={(item, index) =>
+                item.properties.id || index.toString()
+              }
+              renderItem={({ item }: { item: any }) => (
                 <TouchableOpacity
                   onPress={() => {
                     Keyboard.dismiss();

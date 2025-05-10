@@ -36,7 +36,8 @@ export type Location = {
 };
 
 export function searchLocation(query: string) {
-  const array = query.split(" ");
-  const newQuery = array.join("+");
-  return axios.get<Location>(`${apiLocation}/search/?q=${newQuery}`);
+  const newQuery = encodeURIComponent(query);
+  return axios.get<Location>(
+    `${apiLocation}/search?q=${newQuery}&limit=4`
+  );
 }
