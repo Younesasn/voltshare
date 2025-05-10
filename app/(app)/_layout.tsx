@@ -1,6 +1,6 @@
 import { useAuth } from "@/context/AuthContext";
-import { Redirect, Tabs } from "expo-router";
-import React from "react";
+import { Tabs, useRouter } from "expo-router";
+import React, { useEffect } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Feather from "@expo/vector-icons/Feather";
@@ -9,17 +9,20 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 
 export default function AppLayout() {
   const { authState } = useAuth();
-
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (authState?.authenticated === false) {
+      router.replace("/login");
+    }
+  }, [authState?.authenticated]);
+  
   if (authState?.authenticated === null) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color={Colors["shady-950"]} />
       </View>
     );
-  }
-
-  if (!authState?.authenticated) {
-    return <Redirect href="/login" />;
   }
 
   return (

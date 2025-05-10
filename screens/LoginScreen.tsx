@@ -111,6 +111,18 @@ export default function LoginScreen() {
               )}
             </View>
             <View style={{ flexDirection: "column", gap: 10 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => router.navigate("/forgot-password")}
+                >
+                  <ThemedText>Mot de passe oublié ?</ThemedText>
+                </TouchableOpacity>
+              </View>
               <Controller
                 control={control}
                 name="password"
@@ -160,9 +172,7 @@ export default function LoginScreen() {
                 }}
               >
                 <ThemedText>Vous n'avez pas de compte ?</ThemedText>
-                <ThemedText style={{ textDecorationLine: "underline" }}>
-                  Inscrivez-vous
-                </ThemedText>
+                <ThemedText>Inscrivez-vous</ThemedText>
               </TouchableOpacity>
             </View>
           </View>
@@ -190,7 +200,7 @@ export const styles = StyleSheet.create({
     height: "50%",
     width: "100%",
     padding: 20,
-    gap: 30,
+    gap: 25,
     display: "flex",
     justifyContent: "center",
   },

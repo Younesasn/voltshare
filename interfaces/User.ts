@@ -17,7 +17,6 @@ export interface User extends ApiResponse {
   stations?: Station[];
   stationsStarred?: Station[];
   reservations?: Reservation[];
-  
 }
 
 export interface UserRegister {
@@ -29,4 +28,12 @@ export interface UserRegister {
   tel?: string;
   avatar?: string;
   isDeleted?: boolean;
+}
+
+export interface UserPasswordToken {
+  expired: boolean;
+  expiresAt: Date;
+  id: number;
+  token: string;
+  user: User;
 }

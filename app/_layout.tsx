@@ -26,13 +26,22 @@ export default function RootLayout() {
     <>
       <AuthProvider>
         <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(app)" options={{ gestureEnabled: false }} />
-          <Stack.Screen name="add-car" options={{ presentation: "transparentModal" }} />
-          <Stack.Screen name="login" options={{ animation: "none" }} />
+          <Stack.Screen
+            name="(app)"
+            options={{ animation: "none", gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="add-car"
+            options={{ presentation: "transparentModal" }}
+          />
+          <Stack.Screen
+            name="login"
+            options={{ animation: "none", gestureEnabled: false }}
+          />
         </Stack>
       </AuthProvider>
       <Toast />
-      <StatusBar animated translucent barStyle="dark-content"  />
+      <StatusBar animated translucent barStyle="dark-content" />
     </>
   );
 }

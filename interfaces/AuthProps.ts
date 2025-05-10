@@ -1,4 +1,4 @@
-import { User, UserRegister } from "./User";
+import { User, UserPasswordToken, UserRegister } from "./User";
 
 export interface AuthProps {
   authState?: { token: string | null; authenticated: boolean | null };
@@ -10,4 +10,8 @@ export interface AuthProps {
   onDeleteAccount?: (id: any) => Promise<any>;
   onUpdating?: (id: any, userUpdated: UserRegister) => Promise<any>;
   onRefreshing?: () => Promise<any>;
+  onForgotPassword?: (email: string) => Promise<any>;
+  inProgressChangingPassword?: (token: string) => Promise<any>;
+  onChangePassword?: (token: string, password: string) => Promise<any>;
+  loadToken?: () => Promise<any>;
 }
