@@ -149,7 +149,6 @@ export default function LoginScreen() {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "center",
                 justifyContent: "center",
                 gap: 10,
               }}
@@ -168,6 +167,7 @@ export default function LoginScreen() {
                   display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
+                  justifyContent: "center",
                   gap: 4,
                 }}
               >

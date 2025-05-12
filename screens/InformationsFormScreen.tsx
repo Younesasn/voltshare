@@ -3,6 +3,7 @@ import { useAuth } from "@/context/AuthContext";
 import { UserRegister } from "@/interfaces/User";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -87,6 +88,7 @@ export default function InformationsFormScreen() {
         position: "top",
         visibilityTime: 5000,
       });
+      router.back();
     } catch (error: any) {
       setIsLoading(false);
       console.log({ errorUpdating: error.message });
@@ -96,21 +98,31 @@ export default function InformationsFormScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <SafeAreaView style={styles.container}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={10}
+        >
+          <TouchableOpacity style={styles.back} onPress={() => router.back()}>
+            <Ionicons
+              name="arrow-back-outline"
+              size={24}
+              color={Colors["shady-900"]}
+            />
+            <ThemedText>Retour</ThemedText>
+          </TouchableOpacity>
           <ScrollView>
             <View
               style={{
                 flex: 1,
-                alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <ThemedText variant="title">Modifier mes informations</ThemedText>
               <View style={styles.inputContain}>
+                <ThemedText variant="title">
+                  Modifier mes informations
+                </ThemedText>
                 <View style={{ gap: 20 }}>
                   <ThemedText>Identité</ThemedText>
                   <Controller
@@ -219,44 +231,28 @@ export default function InformationsFormScreen() {
             </View>
           </ScrollView>
           <View style={styles.footer}>
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={{
-                borderWidth: 1,
-                borderColor: Colors["shady-950"],
-                borderRadius: 10,
-                paddingVertical: 10,
-                paddingHorizontal: 20,
-              }}
-            >
-              <ThemedText>Retour</ThemedText>
-            </TouchableOpacity>
             <Button
               title="Valider"
               isLoading={isLoading}
               onPress={handleSubmit(update)}
             />
           </View>
-        </SafeAreaView>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </TouchableWithoutFeedback>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
   },
   footer: {
-    paddingHorizontal: 20,
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    width: "100%",
   },
   inputContain: {
     gap: 40,
     width: "100%",
-    padding: 20,
   },
   input: {
     width: "100%",
@@ -269,5 +265,13 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
     fontSize: 12,
+  },
+  back: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    borderRadius: 20,
+    marginBottom: 20,
   },
 });

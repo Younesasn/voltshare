@@ -71,28 +71,32 @@ export default function TwoFAScreen() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={100}
+    <TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
       >
-        <ScrollView
-          contentContainerStyle={styles.container}
-          keyboardShouldPersistTaps="handled"
-        >
-          <ThemedText variant="title">Une dernière chose</ThemedText>
-          <ThemedText style={{ textAlign: "center" }}>
-            Nous vous avons envoyé un code par email. Entrez le code ci-dessous
-          </ThemedText>
+        <ThemedText variant="title">Une dernière chose</ThemedText>
+        <ThemedText style={{ textAlign: "center" }}>
+          Nous vous avons envoyé un code par email. Entrez le code ci-dessous
+        </ThemedText>
 
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            gap: 20,
+            marginTop: 20,
+          }}
+        >
           <View
             style={{
               display: "flex",
               flexDirection: "column",
+              justifyContent: "center",
               alignItems: "center",
-              gap: 20,
-              marginTop: 20,
+              gap: 10,
             }}
           >
             <Controller
@@ -116,14 +120,14 @@ export default function TwoFAScreen() {
             {twoFaError && (
               <ThemedText style={styles.error}>{twoFaError}</ThemedText>
             )}
-            <Button
-              title="Valider"
-              onPress={handleSubmit(twoFa)}
-              isLoading={isLoading}
-            />
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          <Button
+            title="Valider"
+            onPress={handleSubmit(twoFa)}
+            isLoading={isLoading}
+          />
+        </View>
+      </ScrollView>
     </TouchableWithoutFeedback>
   );
 }
@@ -143,7 +147,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 6,
     padding: 10,
-    width: 200,
+    width: "100%",
     textAlign: "center",
   },
   error: {

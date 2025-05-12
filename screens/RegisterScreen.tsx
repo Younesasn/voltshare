@@ -95,6 +95,7 @@ export default function RegisterScreen() {
             size={24}
             color={Colors["shady-900"]}
           />
+          <ThemedText>Retour</ThemedText>
         </TouchableOpacity>
 
         <ScrollView
@@ -253,7 +254,7 @@ export default function RegisterScreen() {
                 }}
               >
                 <View
-                  style={{ display: "flex", gap: 20, alignItems: "center" }}
+                  style={{ display: "flex", gap: 20, width: "100%" }}
                 >
                   {registerError && (
                     <ThemedText style={styles.error}>
@@ -277,10 +278,11 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
   back: {
-    backgroundColor: Colors["shady-50"],
-    borderColor: Colors["shady-900"],
-    borderWidth: 1,
     position: "absolute",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
     top: 60,
     left: 20,
     padding: 5,

@@ -2,10 +2,12 @@ import Button from "@/components/Button";
 import { useAuth } from "@/context/AuthContext";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { router } from "expo-router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { z } from "zod";
 
@@ -42,54 +44,66 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <ThemedText variant="title">Mot de passe oublié</ThemedText>
-        <ThemedText style={{ textAlign: "center" }}>
-          Entrez votre email pour recevoir un lien de réinitialisation de mot de
-          passe
-        </ThemedText>
-        <View
-          style={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            gap: 10,
-          }}
-        >
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={styles.input}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                placeholder="Email"
-                placeholderTextColor={Colors["shady-900"]}
-              />
-            )}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <SafeAreaView style={{ flex: 1, paddingHorizontal: 20 }}>
+        <TouchableOpacity style={styles.back} onPress={() => router.back()}>
+          <Ionicons
+            name="arrow-back-outline"
+            size={24}
+            color={Colors["shady-900"]}
           />
+          <ThemedText>Retour</ThemedText>
+        </TouchableOpacity>
+        <View style={styles.container}>
+          <ThemedText variant="title">Mot de passe oublié</ThemedText>
+          <ThemedText style={{ textAlign: "center" }}>
+            Entrez votre email pour recevoir un lien de réinitialisation de mot
+            de passe
+          </ThemedText>
           <View
             style={{
+              width: "100%",
               display: "flex",
               flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 10,
+              gap: 20,
             }}
           >
-            {errors.email && (
-              <ThemedText style={{ color: "red" }}>
-                {errors.email.message}
-              </ThemedText>
-            )}
-            <Button title="Envoyer" onPress={handleSubmit(onSubmit)} />
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder="Email"
+                  placeholderTextColor={Colors["shady-900"]}
+                />
+              )}
+            />
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                gap: 10,
+              }}
+            >
+              {errors.email && (
+                <ThemedText style={{ color: "red" }}>
+                  {errors.email.message}
+                </ThemedText>
+              )}
+              <Button title="Envoyer" onPress={handleSubmit(onSubmit)} />
+            </View>
           </View>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -100,7 +114,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 20,
     gap: 20,
   },
   input: {
@@ -109,5 +122,13 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 6,
     padding: 10,
+  },
+  back: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    padding: 5,
+    borderRadius: 20,
   },
 });
