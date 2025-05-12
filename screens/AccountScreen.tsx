@@ -7,7 +7,6 @@ import {
   Alert,
   FlatList,
   Image,
-  Modal,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -18,7 +17,6 @@ import moment from "moment";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { router } from "expo-router";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useState } from "react";
 import { deleteCar } from "@/services/CarService";
 import Toast from "react-native-toast-message";
@@ -29,7 +27,6 @@ export default function AccountScreen() {
   const url = `${apiUrl}/images/`;
   const { onLogout, user, onDeleteAccount, onRefreshing } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [isModalStationVisible, setIsModalStationVisible] = useState(false);
 
   const deleteAccount = () => {
     if (!user?.id || !onDeleteAccount) return;
@@ -101,7 +98,7 @@ export default function AccountScreen() {
       </SafeAreaView>
     );
   }
-  
+
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -121,9 +118,7 @@ export default function AccountScreen() {
             }}
           >
             <Image
-              src={
-                user?.avatar ? url + user?.avatar : url + "avatar.avif"
-              }
+              src={user?.avatar ? url + user?.avatar : url + "avatar.avif"}
               style={styles.image}
             />
             <View>
@@ -247,20 +242,7 @@ export default function AccountScreen() {
             </View>
           </View>
         </ScrollView>
-        {/* Footer */}
       </View>
-      {/* Modal Station */}
-      {/* <Modal
-        visible={isModalStationVisible}
-        transparent={true}
-        animationType="fade"
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            
-          </View>
-        </View>
-      </Modal> */}
     </SafeAreaView>
   );
 }
