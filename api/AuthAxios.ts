@@ -23,9 +23,48 @@ const api = axios.create({
 });
 
 let onTokenRefreshed: ((newToken: string) => void) | null = null;
-
 export const setOnTokenRefreshed = (callback: (newToken: string) => void) => {
   onTokenRefreshed = callback;
+};
+
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+const subscribeTokenRefresh = (cb: (token: string) => void) => {
+  refreshSubscribers.push(cb);
+};
+
+const notifySubscribers = (newToken: string) => {
+  refreshSubscribers.forEach((cb) => cb(newToken));
+  refreshSubscribers = [];
+};
+
+const refreshTokenRequest = async (
+  refreshToken: string
+): Promise<string | null> => {
+  try {
+    const response = await axios.post(`${apiUrl}/api/token/refresh`, {
+      refresh_token: refreshToken,
+    });
+
+    const newToken = response.data.token;
+    const newExpiresAt = String(response.data.refresh_token_expiration);
+
+    await SecureStore.setItemAsync(TOKEN_KEY, newToken);
+    await SecureStore.setItemAsync(EXPIRES_AT_KEY, newExpiresAt);
+    await SecureStore.setItemAsync("loggedAt", new Date().toISOString());
+
+    if (onTokenRefreshed) onTokenRefreshed(newToken);
+
+    notifySubscribers(newToken);
+    return newToken;
+  } catch (error) {
+    console.warn("❌ Refresh échoué → déconnexion forcée");
+    await logoutFromSecureStore();
+    return null;
+  } finally {
+    isRefreshing = false;
+  }
 };
 
 api.interceptors.request.use(async (config: any) => {
@@ -54,38 +93,48 @@ api.interceptors.request.use(async (config: any) => {
   if (isExpired) {
     console.warn("❌ Refresh token expiré. Déconnexion.");
     await logoutFromSecureStore();
-    return;
+    return config;
   }
 
   if (diffInSeconds > 59) {
-    try {
-      console.log("🔁 Token expiré, tentative de refresh...");
-      const result = await axios.post(`${apiUrl}/api/token/refresh`, {
-        refresh_token: refreshToken,
-      });
-
-      const newToken = result.data.token;
-      const newExpiresAt = String(result.data.refresh_token_expiration);
-
-      await SecureStore.setItemAsync(TOKEN_KEY, newToken);
-      await SecureStore.setItemAsync(EXPIRES_AT_KEY, newExpiresAt);
-      await SecureStore.setItemAsync("loggedAt", new Date().toISOString());
-
-      config.headers.Authorization = `Bearer ${newToken}`;
-
-      if (onTokenRefreshed) {
-        onTokenRefreshed(newToken);
-      }
-    } catch (error) {
-      console.warn("❌ Refresh échoué → déconnexion forcée");
-      await logoutFromSecureStore();
-      return config;
+    if (!isRefreshing) {
+      isRefreshing = true;
+      refreshTokenRequest(refreshToken);
     }
-  } else {
-    config.headers.Authorization = `Bearer ${token}`;
+
+    return new Promise((resolve) => {
+      subscribeTokenRefresh((newToken) => {
+        config.headers.Authorization = `Bearer ${newToken}`;
+        resolve(config);
+      });
+    });
   }
 
+  config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const status = error.response?.status;
+
+    if (status === 401) {
+      console.warn("🔒 Requête non autorisée (401), déconnexion...");
+      await logoutFromSecureStore();
+    } else if (status === 403) {
+      console.warn("⛔ Accès refusé (403)");
+    } else if (status >= 500) {
+      console.warn(
+        "💥 Erreur serveur :",
+        error.response?.data || error.message
+      );
+    } else {
+      console.warn("⚠️ Erreur HTTP :", error.message);
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export default api;
