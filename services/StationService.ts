@@ -10,3 +10,15 @@ export function getAllStations() {
 export function getStationById(id: number) {
   return api.get<Station>(`${apiUrl}/api/stations/${id}`);
 }
+
+export function getStarredStations() {
+  return api.get<Station[]>(`${apiUrl}/api/stations-starred`);
+}
+
+export function addFavouriteStation(id: number) {
+  return api.post(`${apiUrl}/api/stations/${id}/starred`);
+}
+
+export function removeFavouriteStation(id: number) {
+  return api.post(`${apiUrl}/api/stations/${id}/unstarred`);
+}

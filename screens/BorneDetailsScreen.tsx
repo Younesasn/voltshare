@@ -15,22 +15,72 @@ import Button from "@/components/Button";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useState } from "react";
 import { Station } from "@/interfaces/Station";
-import { getStationById } from "@/services/StationService";
+import {
+  addFavouriteStation,
+  getStarredStations,
+  getStationById,
+  removeFavouriteStation,
+} from "@/services/StationService";
+import { set } from "react-hook-form";
 
 export default function BorneDetailsScreen() {
   const { id } = useLocalSearchParams();
   const newId = parseInt(id as string);
   const [station, setStation] = useState<Station | null>(null);
-  const [isStarred, setIsStarred] = useState(false);
+  const [starredStations, setStarredStations] = useState<Station[]>([]);
 
   useEffect(() => {
-    getStationById(newId).then((res) => {
-      setStation(res.data);
-    }).catch((err) => {
-      console.error("Erreur lors de la récupération du station :", err.message);
-      Alert.alert("Erreur", "Impossible de récupérer les informations.");
-    });
+    getStationById(newId)
+      .then((res) => {
+        setStation(res.data);
+      })
+      .catch((err) => {
+        console.error(
+          "Erreur lors de la récupération du station :",
+          err.message
+        );
+        Alert.alert("Erreur", "Impossible de récupérer les informations.");
+      });
+    getStarredStations()
+      .then((res) => {
+        setStarredStations(res.data);
+      })
+      .catch((err) => {
+        console.error(
+          "Erreur lors de la récupération des stations favoris :",
+          err.message
+        );
+        Alert.alert("Erreur", "Impossible de récupérer les informations.");
+      });
   }, [newId]);
+
+  const addStarredStation = async () => {
+    try {
+      await addFavouriteStation(newId);
+      setStarredStations((prevState: any) => [...prevState, station]);
+    } catch (err: any) {
+      console.error(
+        "Erreur lors de l'ajout de la station favorite :",
+        err.message
+      );
+      Alert.alert("Erreur", "Impossible d'ajouter la station favorite.");
+    }
+  };
+
+  const removeStarredStation = async () => {
+    try {
+      await removeFavouriteStation(newId);
+      setStarredStations((prevState: any) =>
+        prevState.filter((station: Station) => station.id !== newId)
+      );
+    } catch (err: any) {
+      console.error(
+        "Erreur lors de la suppression de la station favorite :",
+        err.message
+      );
+      Alert.alert("Erreur", "Impossible de supprimer la station favorite.");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -63,17 +113,17 @@ export default function BorneDetailsScreen() {
               <ThemedText variant="lilText">2.9km</ThemedText>
             </View>
           </View>
-          {isStarred ? (
+          {starredStations.find((station) => station.id === newId) ? (
             <Entypo
               name="star"
-              onPress={() => setIsStarred(false)}
+              onPress={() => removeStarredStation()}
               size={24}
               color={Colors["shady-950"]}
             />
           ) : (
             <Entypo
               name="star-outlined"
-              onPress={() => setIsStarred(true)}
+              onPress={() => addStarredStation()}
               size={24}
               color={Colors["shady-950"]}
             />
