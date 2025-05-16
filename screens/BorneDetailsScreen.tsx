@@ -21,7 +21,6 @@ import {
   getStationById,
   removeFavouriteStation,
 } from "@/services/StationService";
-import { set } from "react-hook-form";
 
 export default function BorneDetailsScreen() {
   const { id } = useLocalSearchParams();

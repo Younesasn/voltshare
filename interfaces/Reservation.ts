@@ -7,4 +7,6 @@ export interface Reservation extends ApiResponse {
   station: Station;
   car: Car;
   date: Date;
+  startTime: Date;
+  endTime: Date;
 }

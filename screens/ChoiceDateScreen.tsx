@@ -15,7 +15,9 @@ import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import Button from "@/components/Button";
 import { router, useLocalSearchParams } from "expo-router";
-import { getDayOfWeek } from "@/utils/momentFunction";
+import { getStationById } from "@/services/StationService";
+import { Reservation } from "@/interfaces/Reservation";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const hours = [
   "00",
@@ -97,7 +99,23 @@ export default function ChoiceDateScreen() {
   const swiper = useRef();
   const contentSwiper = useRef();
   const [week, setWeek] = useState(0);
+  const [reservations, setReservations] = useState<Reservation[] | null>(null);
   const [value, setValue] = useState(new Date());
+  const [startSlot, setStartSlot] = useState<moment.Moment | null>(null);
+  const [endSlot, setEndSlot] = useState<moment.Moment | null>(null);
+
+  /**
+   * Récupérer les réservations de la station
+   */
+  useEffect(() => {
+    getStationById(newId)
+      .then((res) => {
+        setReservations(res.data.reservations);
+      })
+      .catch((err) => {
+        console.error("Erreur lors de la récupération des réservations :", err);
+      });
+  }, [newId]);
 
   /**
    * Crée un tableau de jours pour les semaines précédentes, actuelles et suivantes.
@@ -128,16 +146,52 @@ export default function ChoiceDateScreen() {
     ];
   }, [value]);
 
+  /**
+   * Vérifie si il y a une réservation pour le jour sélectionné
+   */
+  const hasReservation = reservations?.some((reservation) => {
+    return moment(reservation.startTime).isSame(days[1], "day");
+  });
+
+  /**
+   * Récupère les réservations pour le jour sélectionné
+   */
+  const timeslotsReservation = reservations?.filter((reservation) => {
+    return moment(reservation.startTime).isSame(days[1], "day");
+  });
+
+  /**
+   * Réinitialise le créneau sélectionné
+   */
+  const resetReservation = () => {
+    setStartSlot(null);
+    setEndSlot(null);
+  };
+
+  /**
+   * Affiche les logs du créneau sélectionné
+   */
   useEffect(() => {
-    console.log(days[1]);
-    console.log(getDayOfWeek(days[1]));
-  }, [newId, days]);
+    if (startSlot && endSlot) {
+      console.log("Créneau sélectionné :");
+      console.log("Début :", startSlot.toISOString());
+      console.log("Fin :", moment(endSlot).add(1, "hour").toISOString());
+    }
+  }, [startSlot, endSlot]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Choisissez un créneau</Text>
+        <TouchableOpacity style={styles.back} onPress={() => router.back()}>
+          <Ionicons
+            name="arrow-back-outline"
+            size={24}
+            color={Colors["shady-950"]}
+          />
+          <ThemedText>Retour</ThemedText>
+        </TouchableOpacity>
+        <View style={{ paddingHorizontal: 16 }}>
+          <ThemedText variant="title">Choisissez un créneau</ThemedText>
         </View>
 
         <View style={styles.picker}>
@@ -174,8 +228,7 @@ export default function ChoiceDateScreen() {
                         style={[
                           styles.item,
                           isActive && {
-                            backgroundColor: "#111",
-                            borderColor: "#111",
+                            backgroundColor: Colors["shady-950"],
                           },
                         ]}
                       >
@@ -203,12 +256,23 @@ export default function ChoiceDateScreen() {
             ))}
           </Swiper>
         </View>
+        <View style={{ paddingHorizontal: 16 }}>
+          {/* Affiche le créneau sélectionné */}
+          {startSlot && endSlot ? (
+            <ThemedText>
+              Créneau sélectionné : {startSlot.format("HH:mm")}h -&gt;{" "}
+              {moment(endSlot).add(1, "hour").format("HH:mm")}h
+            </ThemedText>
+          ) : null}
+        </View>
 
+        {/* Affiche les jours */}
         <Swiper
           index={1}
           ref={contentSwiper as MutableRefObject<any>}
           loop={false}
           showsPagination={false}
+          showsVerticalScrollIndicator={false}
           onIndexChanged={(ind) => {
             if (ind === 1) {
               return;
@@ -230,14 +294,42 @@ export default function ChoiceDateScreen() {
           }}
         >
           {days.map((day, index) => {
+            const formatHour = (n: number) => n.toString().padStart(2, "0");
+
+            // 💡 On extrait les réservations de ce jour-là
+            const dayReservations = reservations?.filter((res) =>
+              moment(res.startTime).isSame(day, "day")
+            );
+
             return (
               <View
                 key={index}
-                style={{ flex: 1, paddingHorizontal: 16, paddingVertical: 24 }}
+                style={{ flex: 1, paddingHorizontal: 16, marginBottom: 16 }}
               >
-                <Text style={styles.subtitle}>
-                  {day.toLocaleDateString("fr-FR", { dateStyle: "long" })}
-                </Text>
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    paddingVertical: 12,
+                  }}
+                >
+                  {/* Affiche le jour */}
+                  <ThemedText>
+                    {day.toLocaleDateString("fr-FR", { dateStyle: "long" })}
+                  </ThemedText>
+
+                  {/* Affiche le bouton pour réinitialiser le créneau */}
+                  {startSlot && endSlot ? (
+                    <TouchableOpacity
+                      onPress={resetReservation}
+                      style={{ borderBottomWidth: 1 }}
+                    >
+                      <ThemedText>Réinitialiser</ThemedText>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
                 <ScrollView style={{ height: 620 }}>
                   <View
                     style={{
@@ -252,23 +344,91 @@ export default function ChoiceDateScreen() {
                       {hours.map((hour, index) => {
                         const h = Number(hour);
                         const nextHour = (h + 1) % 24;
-                        const formatHour = (n: number) =>
-                          n.toString().padStart(2, "0");
+
+                        // ✅ On construit une plage horaire correspondant à ce créneau
+                        const slotStart = moment(day)
+                          .hour(h)
+                          .minute(0)
+                          .second(0);
+                        const slotEnd = moment(day).hour(nextHour);
+
+                        // ⛔ Est-ce qu’un créneau de reservation chevauche celui-ci ?
+                        const isTaken = dayReservations?.some((res) => {
+                          const resStart = moment(res.startTime);
+                          const resEnd = moment(res.endTime);
+                          return (
+                            slotStart.isBefore(resEnd) &&
+                            slotEnd.isAfter(resStart)
+                          );
+                        });
+
+                        // ✅ On vérifie si le créneau est sélectionné
+                        const isSelected =
+                          (startSlot &&
+                            !endSlot &&
+                            slotStart.isSame(startSlot)) ||
+                          (startSlot &&
+                            endSlot &&
+                            slotStart.isSameOrAfter(startSlot) &&
+                            slotStart.isBefore(moment(endSlot).add(1, "hour")));
 
                         return (
                           <TouchableOpacity
-                            style={[
-                              styles.hourButton,
-                              {
-                                backgroundColor: Colors["shady-50"],
-                                borderWidth: 1,
-                                borderColor: Colors["shady-300"],
-                              },
-                            ]}
                             key={index}
+                            style={[
+                              isTaken || moment(slotStart).isBefore(moment())
+                                ? styles.hourButtonDisabled
+                                : isSelected
+                                  ? styles.hourButtonSelected
+                                  : styles.hourButton,
+                            ]}
+                            disabled={
+                              isTaken || moment(slotStart).isBefore(moment())
+                            }
+                            onPress={() => {
+                              if (!startSlot) {
+                                setStartSlot(slotStart); // Premier clic = heure de début
+                              } else if (!endSlot) {
+                                if (slotStart.isBefore(startSlot)) {
+                                  // Si clic avant startSlot → on inverse intelligemment
+                                  setEndSlot(startSlot);
+                                  setStartSlot(slotStart);
+                                } else {
+                                  setEndSlot(slotStart); // Deuxième clic = heure de fin
+                                }
+                              } else {
+                                // Si les deux sont déjà définis → on reset tout
+                                setStartSlot(slotStart);
+                                setEndSlot(null);
+                              }
+                            }}
                           >
-                            <ThemedText>Disponible</ThemedText>
-                            <ThemedText>{`De ${formatHour(h)}h à ${formatHour(nextHour)}h`}</ThemedText>
+                            <ThemedText
+                              color={
+                                isTaken || moment(slotStart).isBefore(moment())
+                                  ? Colors["shady-950"]
+                                  : isSelected
+                                    ? Colors["shady-50"]
+                                    : Colors["shady-950"]
+                              }
+                            >
+                              {isTaken || moment(slotStart).isBefore(moment())
+                                ? "Indisponible"
+                                : "Disponible"}
+                            </ThemedText>
+                            <ThemedText
+                              color={
+                                isTaken || moment(slotStart).isBefore(moment())
+                                  ? Colors["shady-950"]
+                                  : isSelected
+                                    ? Colors["shady-50"]
+                                    : Colors["shady-950"]
+                              }
+                            >
+                              {isTaken || moment(slotStart).isBefore(moment())
+                                ? ""
+                                : `De ${formatHour(h)}h à ${formatHour(nextHour)}h`}
+                            </ThemedText>
                           </TouchableOpacity>
                         );
                       })}
@@ -280,19 +440,7 @@ export default function ChoiceDateScreen() {
           })}
         </Swiper>
 
-        <View style={styles.footer}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={{
-              borderWidth: 1,
-              borderColor: Colors["shady-950"],
-              borderRadius: 10,
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-            }}
-          >
-            <ThemedText>Retour</ThemedText>
-          </TouchableOpacity>
+        <View style={{ paddingHorizontal: 16 }}>
           <Button link="../" title="Continuer" />
         </View>
       </View>
@@ -303,10 +451,6 @@ export default function ChoiceDateScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: 24,
-  },
-  header: {
-    paddingHorizontal: 16,
   },
   title: {
     fontSize: 32,
@@ -321,20 +465,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  subtitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#999999",
-    marginBottom: 12,
-  },
-  footer: {
-    marginTop: "auto",
-    paddingHorizontal: 16,
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
   /** Item */
   item: {
     flex: 1,
@@ -344,6 +474,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     borderWidth: 1,
     borderRadius: 8,
+    backgroundColor: "#fff",
     borderColor: "#e3e3e3",
     flexDirection: "column",
     alignItems: "center",
@@ -376,31 +507,57 @@ const styles = StyleSheet.create({
     padding: 0,
     backgroundColor: "transparent",
   },
-  placeholderInset: {
-    // borderWidth: 4,
-    // borderColor: "#e5e7eb",
-    // borderStyle: "dashed",
-    // borderRadius: 9,
-    // flexGrow: 1,
-    // flexShrink: 1,
-    // flexBasis: 0,
-  },
   /** Button */
   hourButton: {
     width: "100%",
     height: 50,
-    display: "flex",
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingBottom: 10,
     borderRadius: 10,
+    backgroundColor: Colors["shady-50"],
+    borderWidth: 1,
+    borderColor: Colors["shady-300"],
+  },
+  hourButtonDisabled: {
+    width: "100%",
+    height: 50,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors["shady-300"],
+    backgroundColor: Colors["shady-200"],
+  },
+  hourButtonSelected: {
+    width: "100%",
+    height: 50,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    borderRadius: 10,
+    backgroundColor: Colors["shady-950"],
   },
   btnText: {
     fontSize: 18,
     lineHeight: 26,
     fontWeight: "600",
     color: "#fff",
+  },
+  back: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    borderRadius: 20,
+    marginBottom: 10,
+    paddingHorizontal: 16,
   },
 });

@@ -1,4 +1,5 @@
 import { ApiResponse } from "./ApiListResponse";
+import { Reservation } from "./Reservation";
 import { User } from "./User";
 
 export interface Station extends ApiResponse {
@@ -13,4 +14,5 @@ export interface Station extends ApiResponse {
   adress: string;
   type: string;
   user: User;
+  reservations: Reservation[];
 }
