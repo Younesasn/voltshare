@@ -1,7 +1,7 @@
 import api from "@/api/AuthAxios";
 import { apiUrl } from "@/context/AuthContext";
 import { ApiListResponse } from "@/interfaces/ApiListResponse";
-import { Station } from "@/interfaces/Station";
+import { Station, StationRegister } from "@/interfaces/Station";
 
 export function getAllStations() {
   return api.get<ApiListResponse<Station>>(`${apiUrl}/api/stations`);
@@ -21,4 +21,8 @@ export function addFavouriteStation(id: number) {
 
 export function removeFavouriteStation(id: number) {
   return api.post(`${apiUrl}/api/stations/${id}/unstarred`);
+}
+
+export function createStation(station: StationRegister) {
+  return api.post(`${apiUrl}/api/stations`, station);
 }

@@ -16,3 +16,16 @@ export interface Station extends ApiResponse {
   user: User;
   reservations: Reservation[];
 }
+
+export interface StationRegister {
+  name: string
+  latitude: number
+  longitude: number
+  adress: string
+  picture: string
+  price: number
+  power: number
+  description: string
+  type: string
+  user: string
+}
