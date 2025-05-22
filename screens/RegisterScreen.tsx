@@ -1,3 +1,4 @@
+import BackButton from "@/components/BackButton";
 import Button from "@/components/Button";
 import { useAuth } from "@/context/AuthContext";
 import { UserRegister } from "@/interfaces/User";
@@ -20,6 +21,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { z } from "zod";
 
 const schema = z
@@ -84,216 +86,194 @@ export default function RegisterScreen() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
-        <TouchableOpacity style={styles.back} onPress={() => router.back()}>
-          <Ionicons
-            name="arrow-back-outline"
-            size={24}
-            color={Colors["shady-900"]}
-          />
-          <ThemedText>Retour</ThemedText>
-        </TouchableOpacity>
-
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={{ flex: 1, padding: 20 }}>
+      <BackButton />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <View style={styles.content}>
-            <View style={styles.contentTitle}>
-              <ThemedText variant="title">Créer un compte</ThemedText>
-            </View>
-            <View style={styles.form}>
-              <View style={styles.inputContain}>
-                <Controller
-                  control={control}
-                  name="firstname"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Prénom"
-                      placeholderTextColor={Colors["shady-900"]}
-                    />
-                  )}
-                />
-                {errors.firstname && (
-                  <Text style={styles.error}>{errors.firstname.message}</Text>
-                )}
+          <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.content}>
+              <View style={styles.contentTitle}>
+                <ThemedText variant="title">Créer un compte</ThemedText>
               </View>
-              <View style={styles.inputContain}>
-                <Controller
-                  control={control}
-                  name="lastname"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Nom"
-                      placeholderTextColor={Colors["shady-900"]}
-                    />
-                  )}
-                />
-                {errors.lastname && (
-                  <Text style={styles.error}>{errors.lastname.message}</Text>
-                )}
-              </View>
-              <View style={styles.inputContain}>
-                <Controller
-                  control={control}
-                  name="email"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Email"
-                      placeholderTextColor={Colors["shady-900"]}
-                    />
-                  )}
-                />
-                {errors.email && (
-                  <Text style={styles.error}>{errors.email.message}</Text>
-                )}
-              </View>
-              <View style={styles.inputContain}>
-                <Controller
-                  control={control}
-                  name="password"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Mot de passe"
-                      placeholderTextColor={Colors["shady-900"]}
-                      secureTextEntry
-                    />
-                  )}
-                />
-                {errors.password && (
-                  <Text style={styles.error}>{errors.password.message}</Text>
-                )}
-              </View>
-              <View style={styles.inputContain}>
-                <Controller
-                  control={control}
-                  name="confirmPassword"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Confirmer le mot de passe"
-                      placeholderTextColor={Colors["shady-900"]}
-                      secureTextEntry
-                    />
-                  )}
-                />
-                {errors.confirmPassword && (
-                  <Text style={styles.error}>
-                    {errors.confirmPassword.message}
-                  </Text>
-                )}
-              </View>
-              <View style={styles.inputContain}>
-                <Controller
-                  control={control}
-                  name="adress"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Adresse"
-                      placeholderTextColor={Colors["shady-900"]}
-                    />
-                  )}
-                />
-                {errors.adress && (
-                  <Text style={styles.error}>{errors.adress.message}</Text>
-                )}
-              </View>
-              <View style={styles.inputContain}>
-                <Controller
-                  control={control}
-                  name="tel"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Téléphone"
-                      placeholderTextColor={Colors["shady-900"]}
-                      keyboardType="numeric"
-                    />
-                  )}
-                />
-                {errors.tel && (
-                  <Text style={styles.error}>{errors.tel.message}</Text>
-                )}
-              </View>
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: 20,
-                  justifyContent: "center",
-                }}
-              >
-                <View
-                  style={{ display: "flex", gap: 20, width: "100%" }}
-                >
-                  {registerError && (
-                    <ThemedText style={styles.error}>
-                      {registerError}
-                    </ThemedText>
-                  )}
-                  <Button
-                    title="Créer un compte"
-                    onPress={handleSubmit(register)}
-                    isLoading={isLoading}
+              <View style={styles.form}>
+                <View style={styles.inputContain}>
+                  <Controller
+                    control={control}
+                    name="firstname"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Prénom"
+                        placeholderTextColor={Colors["shady-900"]}
+                      />
+                    )}
                   />
+                  {errors.firstname && (
+                    <Text style={styles.error}>{errors.firstname.message}</Text>
+                  )}
+                </View>
+                <View style={styles.inputContain}>
+                  <Controller
+                    control={control}
+                    name="lastname"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Nom"
+                        placeholderTextColor={Colors["shady-900"]}
+                      />
+                    )}
+                  />
+                  {errors.lastname && (
+                    <Text style={styles.error}>{errors.lastname.message}</Text>
+                  )}
+                </View>
+                <View style={styles.inputContain}>
+                  <Controller
+                    control={control}
+                    name="email"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Email"
+                        placeholderTextColor={Colors["shady-900"]}
+                      />
+                    )}
+                  />
+                  {errors.email && (
+                    <Text style={styles.error}>{errors.email.message}</Text>
+                  )}
+                </View>
+                <View style={styles.inputContain}>
+                  <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Mot de passe"
+                        placeholderTextColor={Colors["shady-900"]}
+                        secureTextEntry
+                      />
+                    )}
+                  />
+                  {errors.password && (
+                    <Text style={styles.error}>{errors.password.message}</Text>
+                  )}
+                </View>
+                <View style={styles.inputContain}>
+                  <Controller
+                    control={control}
+                    name="confirmPassword"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Confirmer le mot de passe"
+                        placeholderTextColor={Colors["shady-900"]}
+                        secureTextEntry
+                      />
+                    )}
+                  />
+                  {errors.confirmPassword && (
+                    <Text style={styles.error}>
+                      {errors.confirmPassword.message}
+                    </Text>
+                  )}
+                </View>
+                <View style={styles.inputContain}>
+                  <Controller
+                    control={control}
+                    name="adress"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Adresse"
+                        placeholderTextColor={Colors["shady-900"]}
+                      />
+                    )}
+                  />
+                  {errors.adress && (
+                    <Text style={styles.error}>{errors.adress.message}</Text>
+                  )}
+                </View>
+                <View style={styles.inputContain}>
+                  <Controller
+                    control={control}
+                    name="tel"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Téléphone"
+                        placeholderTextColor={Colors["shady-900"]}
+                        keyboardType="numeric"
+                      />
+                    )}
+                  />
+                  {errors.tel && (
+                    <Text style={styles.error}>{errors.tel.message}</Text>
+                  )}
+                </View>
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: 20,
+                    justifyContent: "center",
+                  }}
+                >
+                  <View style={{ display: "flex", gap: 20, width: "100%" }}>
+                    {registerError && (
+                      <ThemedText style={styles.error}>
+                        {registerError}
+                      </ThemedText>
+                    )}
+                    <Button
+                      title="Créer un compte"
+                      onPress={handleSubmit(register)}
+                      isLoading={isLoading}
+                    />
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  back: {
-    position: "absolute",
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    top: 60,
-    left: 20,
-    padding: 5,
-    borderRadius: 20,
-    zIndex: 90,
-    elevation: 10,
-  },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "center",
-    padding: 20,
   },
   content: {
     width: "100%",
