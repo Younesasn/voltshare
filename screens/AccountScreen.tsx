@@ -133,7 +133,7 @@ export default function AccountScreen() {
           </TouchableOpacity>
         </View>
         <ScrollView>
-          <View style={{ paddingVertical: 20, gap: 20 }}>
+          <View style={{ paddingVertical: 20, gap: 20, marginBottom: 200 }}>
             <View style={{ gap: 10 }}>
               <ThemedText variant="title">Informations Personnelles</ThemedText>
               <TouchableOpacity
@@ -188,22 +188,10 @@ export default function AccountScreen() {
                   data={user?.stations}
                   ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
                   renderItem={({ item }) => (
-                    // <TouchableOpacity style={styles.buttonStation}>
-                    //   <View>
-                    //     <ThemedText>{item.name}</ThemedText>
-                    //     <ThemedText variant="lilText">{item.type}</ThemedText>
-                    //   </View>
-                    //   <Image
-                    //     source={require("../assets/images/borne.avif")}
-                    //     style={{
-                    //       width: "50%",
-                    //       height: 100,
-                    //       borderTopRightRadius: 5,
-                    //       borderBottomRightRadius: 5,
-                    //     }}
-                    //   />
-                    // </TouchableOpacity>
-                    <View></View>
+                    <View>
+                      <ThemedText>{item.name}</ThemedText>
+                      <ThemedText>{item.adress}</ThemedText>
+                    </View>
                   )}
                   keyExtractor={(item) => item.id?.toString() as string}
                   style={{ paddingVertical: 20 }}
