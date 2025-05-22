@@ -5,7 +5,6 @@ import {
   FlatList,
   Keyboard,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -15,18 +14,16 @@ import Octicons from "@expo/vector-icons/Octicons";
 import { ThemedText } from "@/themes/ThemedText";
 import { Link } from "expo-router";
 import { getAllStations } from "@/services/StationService";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Station } from "@/interfaces/Station";
 import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { searchLocation } from "@/services/SearchLocationService";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import debounce from "lodash.debounce";
 
 export function Map() {
   const [stations, setStations] = useState<Station[]>([]);
@@ -34,7 +31,6 @@ export function Map() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
   );
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const mapRef = useRef<MapView>(null);
   const [searchCoords, setSearchCoords] = useState<number[] | null>(null);
   const [searchResult, setSearchResult] = useState<[] | null>(null);
@@ -44,7 +40,6 @@ export function Map() {
   const {
     control,
     handleSubmit,
-    formState: { errors },
     setValue,
   } = useForm({
     resolver: zodResolver(schema),
@@ -70,7 +65,6 @@ export function Map() {
   const getLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      setErrorMsg("Permission to access location was denied");
       return;
     }
 
@@ -131,11 +125,6 @@ export function Map() {
       setSearchResult(null);
     }
   };
-
-  const debouncedFetchSuggestions = useMemo(
-    () => debounce(fetchSearchSuggestions, 300),
-    []
-  );
 
   useEffect(() => {
     refreshStations();
@@ -229,7 +218,7 @@ export function Map() {
                   onBlur={onBlur}
                   onChangeText={(text) => {
                     onChange(text);
-                    debouncedFetchSuggestions(text);
+                    fetchSearchSuggestions(text);
                   }}
                   value={value}
                   placeholder="Rechercher un lieu..."
