@@ -1,9 +1,10 @@
+import BackButton from "@/components/BackButton";
 import Button from "@/components/Button";
 import { useAuth } from "@/context/AuthContext";
 import { UserRegister } from "@/interfaces/User";
+import { getAllStations } from "@/services/StationService";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -16,7 +17,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -27,7 +27,6 @@ import { z } from "zod";
 export default function InformationsFormScreen() {
   const { user, onUpdating, onRefreshing } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [updatingError, setUpdatingError] = useState<string | null>(null);
   const schema = z.object({
     firstname: z.string().min(1, "Le prénom est requis"),
     lastname: z.string().min(1, "Le nom est requis"),
@@ -75,10 +74,10 @@ export default function InformationsFormScreen() {
       });
       if (result.error) {
         setIsLoading(false);
-        setUpdatingError(result.message);
         return;
       }
       await onRefreshing!();
+      await getAllStations();
       setIsLoading(false);
       Toast.show({
         autoHide: true,
@@ -92,7 +91,6 @@ export default function InformationsFormScreen() {
     } catch (error: any) {
       setIsLoading(false);
       console.log({ errorUpdating: error.message });
-      setUpdatingError("Une erreur est survenue, veuillez réessayer.");
     }
   };
 
@@ -104,14 +102,7 @@ export default function InformationsFormScreen() {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           keyboardVerticalOffset={10}
         >
-          <TouchableOpacity style={styles.back} onPress={() => router.back()}>
-            <Ionicons
-              name="arrow-back-outline"
-              size={24}
-              color={Colors["shady-900"]}
-            />
-            <ThemedText>Retour</ThemedText>
-          </TouchableOpacity>
+          <BackButton />
           <ScrollView>
             <View
               style={{
