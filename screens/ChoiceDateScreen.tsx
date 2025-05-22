@@ -18,6 +18,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { getStationById } from "@/services/StationService";
 import { Reservation } from "@/interfaces/Reservation";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import BackButton from "@/components/BackButton";
 
 const hours = [
   "00",
@@ -182,14 +183,9 @@ export default function ChoiceDateScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <TouchableOpacity style={styles.back} onPress={() => router.back()}>
-          <Ionicons
-            name="arrow-back-outline"
-            size={24}
-            color={Colors["shady-950"]}
-          />
-          <ThemedText>Retour</ThemedText>
-        </TouchableOpacity>
+        <View style={{ paddingHorizontal: 16 }}>
+          <BackButton />
+        </View>
         <View style={{ paddingHorizontal: 16 }}>
           <ThemedText variant="title">Choisissez un créneau</ThemedText>
         </View>

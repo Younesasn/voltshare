@@ -1,3 +1,4 @@
+import BackButton from "@/components/BackButton";
 import Button from "@/components/Button";
 import { useAuth } from "@/context/AuthContext";
 import { Colors } from "@/themes/Colors";
@@ -49,14 +50,7 @@ export default function ForgotPasswordScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <SafeAreaView style={{ flex: 1, paddingHorizontal: 20 }}>
-        <TouchableOpacity style={styles.back} onPress={() => router.back()}>
-          <Ionicons
-            name="arrow-back-outline"
-            size={24}
-            color={Colors["shady-900"]}
-          />
-          <ThemedText>Retour</ThemedText>
-        </TouchableOpacity>
+        <BackButton />
         <View style={styles.container}>
           <ThemedText variant="title">Mot de passe oublié</ThemedText>
           <ThemedText style={{ textAlign: "center" }}>
