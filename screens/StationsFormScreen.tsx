@@ -237,9 +237,9 @@ export default function StationsFormScreen() {
                       />
                     )}
                   />
-                  {errors.description && (
+                  {errors.power && (
                     <ThemedText style={styles.error}>
-                      {errors.description.message}
+                      {errors.power.message}
                     </ThemedText>
                   )}
                 </View>
@@ -260,9 +260,9 @@ export default function StationsFormScreen() {
                       />
                     )}
                   />
-                  {errors.description && (
+                  {errors.price && (
                     <ThemedText style={styles.error}>
-                      {errors.description.message}
+                      {errors.price.message}
                     </ThemedText>
                   )}
                 </View>
