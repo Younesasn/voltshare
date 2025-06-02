@@ -12,9 +12,9 @@ import {
 import MapView, { Marker } from "react-native-maps";
 import Octicons from "@expo/vector-icons/Octicons";
 import { ThemedText } from "@/themes/ThemedText";
-import { Link } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
 import { getAllStations } from "@/services/StationService";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Station } from "@/interfaces/Station";
 import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -127,9 +127,9 @@ export function Map() {
   };
 
   useEffect(() => {
-    refreshStations();
-    getLocation();
-  }, []);
+      refreshStations();
+      getLocation();
+    }, []);
 
   if (loading) {
     return (
@@ -228,7 +228,7 @@ export function Map() {
               )}
             />
             <TouchableOpacity onPress={handleSubmit(getSearchLocation)}>
-              <MaterialIcons name="search" size={30} color="black" />
+              <MaterialIcons name="search" size={24} color="black" />
             </TouchableOpacity>
           </View>
 
@@ -284,36 +284,11 @@ export function Map() {
         >
           <FontAwesome6
             name="location-arrow"
-            size={34}
+            size={24}
             color={Colors["shady-950"]}
           />
         </TouchableOpacity>
       </SafeAreaView>
-
-      {/* <View
-        style={{
-          // position: "absolute",
-          width: "100%",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingHorizontal: 20,
-        }}
-      >
-        <TouchableOpacity onPress={refreshStations}>
-          <Ionicons
-            name="reload-circle"
-            size={34}
-            color={Colors["shady-950"]}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={getLocation}>
-          <FontAwesome6
-            name="location-arrow"
-            size={34}
-            color={Colors["shady-950"]}
-          />
-        </TouchableOpacity>
-      </View> */}
     </View>
   );
 }
@@ -361,7 +336,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 10,
+    paddingHorizontal: 10,
     borderRadius: 14,
     borderColor: Colors["shady-300"],
     borderWidth: 1,
