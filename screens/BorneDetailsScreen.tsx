@@ -21,6 +21,7 @@ import {
   getStationById,
   removeFavouriteStation,
 } from "@/services/StationService";
+import Toast from "react-native-toast-message";
 
 export default function BorneDetailsScreen() {
   const { id } = useLocalSearchParams();
@@ -57,6 +58,14 @@ export default function BorneDetailsScreen() {
     try {
       await addFavouriteStation(newId);
       setStarredStations((prevState: any) => [...prevState, station]);
+      Toast.show({
+        autoHide: true,
+        type: "success",
+        text1: "Ajouté aux favoris ! ⭐️",
+        text2: "La borne a bien été ajouté dans vos favoris.",
+        position: "top",
+        visibilityTime: 5000,
+      });
     } catch (err: any) {
       console.error(
         "Erreur lors de l'ajout de la station favorite :",
@@ -72,6 +81,14 @@ export default function BorneDetailsScreen() {
       setStarredStations((prevState: any) =>
         prevState.filter((station: Station) => station.id !== newId)
       );
+      Toast.show({
+        autoHide: true,
+        type: "success",
+        text1: "Surppimé des favoris ! 🗑️",
+        text2: "La borne a bien été supprimé de vos favoris.",
+        position: "top",
+        visibilityTime: 5000,
+      });
     } catch (err: any) {
       console.error(
         "Erreur lors de la suppression de la station favorite :",
@@ -101,7 +118,7 @@ export default function BorneDetailsScreen() {
       <ScrollView style={styles.content}>
         <View style={styles.contentTitle}>
           <View>
-            <View style={{ width: 360 }}>
+            <View>
               <ThemedText variant="title">{station?.name}</ThemedText>
             </View>
             <View
@@ -129,9 +146,9 @@ export default function BorneDetailsScreen() {
           )}
         </View>
 
-        <ThemedText variant="lilText" style={{ marginBottom: 20 }}>
-          {station?.description}
-        </ThemedText>
+        <View style={{marginBottom: 20}}>
+          <ThemedText>{station?.description}</ThemedText>
+        </View>
 
         <View
           style={{
@@ -156,7 +173,7 @@ export default function BorneDetailsScreen() {
             }}
           >
             <View>
-              <ThemedText>{station?.type}</ThemedText>
+              <ThemedText>Type 2</ThemedText>
               <ThemedText variant="lilText">{station?.power}kW</ThemedText>
             </View>
             <ThemedText variant="lilText">•</ThemedText>
@@ -229,6 +246,7 @@ const styles = StyleSheet.create({
   content: {
     display: "flex",
     flexDirection: "column",
+    width: "100%",
     padding: 20,
   },
   contentTitle: {
