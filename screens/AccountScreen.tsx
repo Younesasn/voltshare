@@ -132,7 +132,7 @@ export default function AccountScreen() {
             <MaterialIcons name="logout" size={24} color="black" />
           </TouchableOpacity>
         </View>
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{ paddingVertical: 20, gap: 20, marginBottom: 200 }}>
             <View style={{ gap: 10 }}>
               <ThemedText variant="title">Informations Personnelles</ThemedText>
@@ -193,8 +193,7 @@ export default function AccountScreen() {
                       <ThemedText>{item.adress}</ThemedText>
                     </View>
                   )}
-                  keyExtractor={(item) => item.id?.toString() as string}
-                  style={{ paddingVertical: 20 }}
+                  keyExtractor={(item) => item.id?.toString()}
                 />
               )}
               <TouchableOpacity

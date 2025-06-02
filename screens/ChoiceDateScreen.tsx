@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useEffect, MutableRefObject } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -14,10 +14,9 @@ import Swiper from "react-native-swiper";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import Button from "@/components/Button";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { getStationById } from "@/services/StationService";
 import { Reservation } from "@/interfaces/Reservation";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import BackButton from "@/components/BackButton";
 
 const hours = [
