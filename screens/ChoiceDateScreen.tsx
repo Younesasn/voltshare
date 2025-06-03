@@ -18,6 +18,10 @@ import { useLocalSearchParams } from "expo-router";
 import { getStationById } from "@/services/StationService";
 import { Reservation } from "@/interfaces/Reservation";
 import BackButton from "@/components/BackButton";
+import { Station } from "@/interfaces/Station";
+import { useAuth } from "@/context/AuthContext";
+import { createSession } from "@/services/StripeCheckoutService";
+import * as WebBrowser from "expo-web-browser";
 
 const hours = [
   "00",
@@ -96,9 +100,11 @@ moment.defineLocale("fr", {
 export default function ChoiceDateScreen() {
   const { id } = useLocalSearchParams();
   const newId = parseInt(id as string);
-  const swiper = useRef();
-  const contentSwiper = useRef();
+  const swiper = useRef(null);
+  const contentSwiper = useRef(null);
   const [week, setWeek] = useState(0);
+  const { user } = useAuth();
+  const [station, setStation] = useState<Station | null>(null);
   const [reservations, setReservations] = useState<Reservation[] | null>(null);
   const [value, setValue] = useState(new Date());
   const [startSlot, setStartSlot] = useState<moment.Moment | null>(null);
@@ -110,6 +116,7 @@ export default function ChoiceDateScreen() {
   useEffect(() => {
     getStationById(newId)
       .then((res) => {
+        setStation(res.data);
         setReservations(res.data.reservations);
       })
       .catch((err) => {
@@ -179,6 +186,37 @@ export default function ChoiceDateScreen() {
     }
   }, [startSlot, endSlot]);
 
+  const createUrlSession = async () => {
+    try {
+      if (!user) {
+        console.error("Utilisateur non connecté");
+        return;
+      }
+
+      if (!station?.name) {
+        console.error("Station non trouvée");
+        return;
+      }
+
+      const res = await createSession({
+        user: user,
+        product_name: station.name,
+        amount: 10,
+      });
+
+      if (!res.data) {
+        console.error("Pas d'URL de session reçue");
+        return;
+      }
+      const url = res.data.url;
+      console.log("URL de session reçue:", url);
+      const result = await WebBrowser.openBrowserAsync(url);
+      console.log("Résultat de l'ouverture du navigateur:", result);
+    } catch (error) {
+      console.error("Erreur lors de la création de la session:", error);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -192,7 +230,7 @@ export default function ChoiceDateScreen() {
         <View style={styles.picker}>
           <Swiper
             index={1}
-            ref={swiper as MutableRefObject<any>}
+            ref={swiper}
             loop={false}
             showsPagination={false}
             onIndexChanged={(id) => {
@@ -264,7 +302,7 @@ export default function ChoiceDateScreen() {
         {/* Affiche les jours */}
         <Swiper
           index={1}
-          ref={contentSwiper as MutableRefObject<any>}
+          ref={contentSwiper}
           loop={false}
           showsPagination={false}
           showsVerticalScrollIndicator={false}
@@ -347,7 +385,7 @@ export default function ChoiceDateScreen() {
                           .second(0);
                         const slotEnd = moment(day).hour(nextHour);
 
-                        // ⛔ Est-ce qu’un créneau de reservation chevauche celui-ci ?
+                        // ⛔ Est-ce qu'un créneau de reservation chevauche celui-ci ?
                         const isTaken = dayReservations?.some((res) => {
                           const resStart = moment(res.startTime);
                           const resEnd = moment(res.endTime);
@@ -436,7 +474,7 @@ export default function ChoiceDateScreen() {
         </Swiper>
 
         <View style={{ paddingHorizontal: 16 }}>
-          <Button link="../" title="Continuer" />
+          <Button title="Continuer" onPress={createUrlSession} />
         </View>
       </View>
     </SafeAreaView>

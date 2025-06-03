@@ -1,33 +1,43 @@
-import { StyleSheet, Text, type TextProps } from 'react-native';
+import { StyleSheet, Text, type TextProps } from "react-native";
 
 const styles = StyleSheet.create({
   title: {
     fontSize: 26,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   text: {
     fontSize: 16,
-    fontWeight: 'regular',
+    fontWeight: "regular",
   },
   lilText: {
     fontSize: 12,
-    fontWeight: 'regular',
+    fontWeight: "regular",
   },
   logo: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   placeholder: {
     fontSize: 12,
-    fontWeight: 'medium',
+    fontWeight: "medium",
   },
 });
 
 type Props = TextProps & {
   variant?: keyof typeof styles;
   color?: string;
+  isCenter?: boolean;
 };
 
-export function ThemedText({ variant, color, ...rest }: Props) {
-  return <Text style={[styles[variant ?? 'text'], { color, fontFamily: 'Uber' }]} {...rest} />;
-};
+export function ThemedText({ variant, color, isCenter, ...rest }: Props) {
+  return (
+    <Text
+      style={[
+        styles[variant ?? "text"],
+        isCenter ? { textAlign: "center" } : null,
+        { color, fontFamily: "Uber" },
+      ]}
+      {...rest}
+    />
+  );
+}
