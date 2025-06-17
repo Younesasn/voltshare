@@ -1,10 +1,24 @@
 import Button from "@/components/Button";
 import { ThemedText } from "@/themes/ThemedText";
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useEffect } from "react";
+import { useReservationRefresh } from "@/hooks/useReservationRefresh";
 
 export default function SuccesPage() {
+  const { refreshAllData } = useReservationRefresh();
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({ gestureEnabled: false });
+    refreshAllData();
+  }, []);
+
+  const handleReturnToMap = () => {
+    router.replace("/(app)");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ThemedText variant="title">Merci d'avoir choisi Voltshare !</ThemedText>
@@ -13,9 +27,7 @@ export default function SuccesPage() {
       </ThemedText>
       <Button
         title="Retourner à la carte"
-        onPress={() => {
-          router.replace("/");
-        }}
+        onPress={handleReturnToMap}
       />
     </SafeAreaView>
   );

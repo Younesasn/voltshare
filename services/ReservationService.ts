@@ -9,6 +9,7 @@ export function createReservation(reservation: {
   station: string;
   user: string;
   car: string;
+  price: number;
 }) {
   return api.post<Reservation>(`${apiUrl}/api/reservations`, reservation);
 }

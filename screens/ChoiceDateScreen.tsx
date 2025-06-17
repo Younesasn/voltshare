@@ -14,14 +14,12 @@ import Swiper from "react-native-swiper";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import Button from "@/components/Button";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { getStationById } from "@/services/StationService";
 import { Reservation } from "@/interfaces/Reservation";
 import BackButton from "@/components/BackButton";
 import { Station } from "@/interfaces/Station";
-import { useAuth } from "@/context/AuthContext";
-import { createSession } from "@/services/StripeCheckoutService";
-import * as WebBrowser from "expo-web-browser";
+import * as SecureStore from "expo-secure-store";
 
 const hours = [
   "00",
@@ -103,12 +101,12 @@ export default function ChoiceDateScreen() {
   const swiper = useRef(null);
   const contentSwiper = useRef(null);
   const [week, setWeek] = useState(0);
-  const { user } = useAuth();
   const [station, setStation] = useState<Station | null>(null);
   const [reservations, setReservations] = useState<Reservation[] | null>(null);
   const [value, setValue] = useState(new Date());
   const [startSlot, setStartSlot] = useState<moment.Moment | null>(null);
   const [endSlot, setEndSlot] = useState<moment.Moment | null>(null);
+  const [disabled, setDisabled] = useState<boolean>(true);
 
   /**
    * Récupérer les réservations de la station
@@ -154,67 +152,34 @@ export default function ChoiceDateScreen() {
   }, [value]);
 
   /**
-   * Vérifie si il y a une réservation pour le jour sélectionné
-   */
-  const hasReservation = reservations?.some((reservation) => {
-    return moment(reservation.startTime).isSame(days[1], "day");
-  });
-
-  /**
-   * Récupère les réservations pour le jour sélectionné
-   */
-  const timeslotsReservation = reservations?.filter((reservation) => {
-    return moment(reservation.startTime).isSame(days[1], "day");
-  });
-
-  /**
    * Réinitialise le créneau sélectionné
    */
-  const resetReservation = () => {
+  const resetReservation = async () => {
     setStartSlot(null);
     setEndSlot(null);
   };
 
   /**
-   * Affiche les logs du créneau sélectionné
+   * Modifie l'état du bouton 'Continuer'
    */
   useEffect(() => {
+    setDisabled(true);
     if (startSlot && endSlot) {
-      console.log("Créneau sélectionné :");
-      console.log("Début :", startSlot.toISOString());
-      console.log("Fin :", moment(endSlot).add(1, "hour").toISOString());
+      setDisabled(false);
     }
   }, [startSlot, endSlot]);
 
-  const createUrlSession = async () => {
-    try {
-      if (!user) {
-        console.error("Utilisateur non connecté");
-        return;
-      }
-
-      if (!station?.name) {
-        console.error("Station non trouvée");
-        return;
-      }
-
-      const res = await createSession({
-        user: user,
-        product_name: station.name,
-        amount: 10,
-      });
-
-      if (!res.data) {
-        console.error("Pas d'URL de session reçue");
-        return;
-      }
-      const url = res.data.url;
-      console.log("URL de session reçue:", url);
-      const result = await WebBrowser.openBrowserAsync(url);
-      console.log("Résultat de l'ouverture du navigateur:", result);
-    } catch (error) {
-      console.error("Erreur lors de la création de la session:", error);
-    }
+  const checkout = async () => {
+    await SecureStore.setItemAsync("station", JSON.stringify(station));
+    await SecureStore.setItemAsync(
+      "timeslots",
+      JSON.stringify({
+        start: startSlot?.toDate(),
+        end: endSlot?.toDate(),
+      })
+    );
+    resetReservation();
+    router.navigate("/checkout");
   };
 
   return (
@@ -474,7 +439,7 @@ export default function ChoiceDateScreen() {
         </Swiper>
 
         <View style={{ paddingHorizontal: 16 }}>
-          <Button title="Continuer" onPress={createUrlSession} />
+          <Button title="Continuer" onPress={checkout} disabled={disabled} />
         </View>
       </View>
     </SafeAreaView>

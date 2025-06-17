@@ -1,7 +1,6 @@
 import { Colors } from "@/themes/Colors";
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Keyboard,
   StyleSheet,
@@ -12,10 +11,8 @@ import {
 import MapView, { Marker } from "react-native-maps";
 import Octicons from "@expo/vector-icons/Octicons";
 import { ThemedText } from "@/themes/ThemedText";
-import { Link, useFocusEffect } from "expo-router";
-import { getAllStations } from "@/services/StationService";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Station } from "@/interfaces/Station";
+import { Link } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
@@ -24,10 +21,10 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useStations } from "@/context/StationContext";
 
 export function Map() {
-  const [stations, setStations] = useState<Station[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { stations, loading, refreshStations } = useStations();
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
   );
@@ -37,30 +34,13 @@ export function Map() {
   const schema = z.object({
     address: z.string().min(1, "Veuillez saisir une adresse"),
   });
-  const {
-    control,
-    handleSubmit,
-    setValue,
-  } = useForm({
+  const { control, handleSubmit, setValue } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       address: "",
     },
   });
   const delta = 0.0421;
-
-  const refreshStations = async () => {
-    try {
-      setLoading(true);
-      const res = await getAllStations();
-      setStations(res.data.member);
-      setLoading(false);
-    } catch (err: any) {
-      setLoading(false);
-      console.error("Erreur lors du rafraîchissement :", err.message);
-      Alert.alert("Erreur", "Impossible de récupérer les bornes.");
-    }
-  };
 
   const getLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -127,9 +107,9 @@ export function Map() {
   };
 
   useEffect(() => {
-      refreshStations();
-      getLocation();
-    }, []);
+    refreshStations();
+    getLocation();
+  }, []);
 
   if (loading) {
     return (
@@ -163,7 +143,7 @@ export function Map() {
             key="recherche"
           />
         )}
-        {stations?.map((borne, key) => {
+        {stations?.map((borne) => {
           return (
             <Marker
               coordinate={{
@@ -171,7 +151,7 @@ export function Map() {
                 longitude: borne.longitude,
               }}
               title={borne.name}
-              key={key}
+              key={borne.id}
             >
               <Link href={`./borne-details/${borne.id}`}>
                 <View style={styles.borne}>

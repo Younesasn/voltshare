@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/context/AuthContext";
+import { StationProvider } from "@/context/StationContext";
 import { SplashScreen, Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
@@ -13,19 +14,29 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (loaded || error) {
+    if (error) throw error;
+  }, [error]);
+
+  useEffect(() => {
+    if (loaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error]);
+  }, [loaded]);
 
-  if (!loaded && !error) {
+  if (!loaded) {
     return null;
   }
 
   return (
-    <>
-      <AuthProvider>
+    <AuthProvider>
+      <StationProvider>
         <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen
+            name="success-payment"
+            options={{
+              gestureEnabled: false,
+            }}
+          />
           <Stack.Screen
             name="(app)"
             options={{ animation: "none", gestureEnabled: false }}
@@ -39,9 +50,9 @@ export default function RootLayout() {
             options={{ animation: "none", gestureEnabled: false }}
           />
         </Stack>
-      </AuthProvider>
-      <Toast />
-      <StatusBar animated translucent barStyle="dark-content" />
-    </>
+        <Toast />
+        <StatusBar animated translucent barStyle="dark-content" />
+      </StationProvider>
+    </AuthProvider>
   );
 }

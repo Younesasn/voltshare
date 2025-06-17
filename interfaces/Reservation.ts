@@ -9,4 +9,5 @@ export interface Reservation extends ApiResponse {
   date: Date;
   startTime: Date;
   endTime: Date;
+  price: number;
 }
