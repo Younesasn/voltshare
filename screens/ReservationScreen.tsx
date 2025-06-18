@@ -11,19 +11,19 @@ export default function ReservationScreen() {
   const { user } = useAuth();
 
   useEffect(() => {
-    setReservations(user?.reservations);
+    setReservations(user?.reservations?.reverse());
   }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{ display: "flex", gap: 8 }}>
+      <View style={{ display: "flex", gap: 10 }}>
         <ThemedText variant="title">Réservations</ThemedText>
         <ThemedText>
           Vous trouverez la liste de toute les réservations passées par vous et
           vos clients
         </ThemedText>
       </View>
-      <View style={{height: "36%"}}>
+      <View style={{height: "34%"}}>
         <View style={[styles.row, styles.header]}>
           <ThemedText style={styles.cell}>Date</ThemedText>
           <ThemedText style={styles.cell}>Début</ThemedText>
