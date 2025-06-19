@@ -11,7 +11,7 @@ import {
 import MapView, { Marker } from "react-native-maps";
 import Octicons from "@expo/vector-icons/Octicons";
 import { ThemedText } from "@/themes/ThemedText";
-import { Link } from "expo-router";
+import { Link,  useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -31,6 +31,7 @@ export function Map() {
   const mapRef = useRef<MapView>(null);
   const [searchCoords, setSearchCoords] = useState<number[] | null>(null);
   const [searchResult, setSearchResult] = useState<[] | null>(null);
+  const router = useRouter();
   const schema = z.object({
     address: z.string().min(1, "Veuillez saisir une adresse"),
   });
@@ -267,6 +268,17 @@ export function Map() {
             size={24}
             color={Colors["shady-950"]}
           />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {router.navigate("/starred-station")}}
+          style={{
+            marginHorizontal: 15,
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "flex-end",
+          }}
+        >
+          <FontAwesome6 name="heart-circle-bolt" size={24} color={Colors["shady-950"]} />
         </TouchableOpacity>
       </SafeAreaView>
     </View>
