@@ -9,7 +9,6 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
       "config": {
         "usesNonExemptEncryption": false
       },
@@ -50,7 +49,9 @@
       [
         "expo-font",
         {
-          "fonts": ["./assets/fonts/UberMove-Regular.ttf"]
+          "fonts": [
+            "./assets/fonts/UberMove-Regular.ttf"
+          ]
         }
       ],
       [
@@ -76,6 +77,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1ee5ae21-c599-40a4-a374-3eb7d124f22d"
+      }
+    },
+    "owner": "younesasn"
   }
 }
