@@ -11,7 +11,7 @@ import {
 import MapView, { Marker } from "react-native-maps";
 import Octicons from "@expo/vector-icons/Octicons";
 import { ThemedText } from "@/themes/ThemedText";
-import { Link,  useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -181,13 +181,13 @@ export function Map() {
         })}
       </MapView>
 
-      <SafeAreaView style={{ position: "absolute", width: "100%" }}>
+      <SafeAreaView style={{ position: "absolute" }}>
         <View
           style={{
             marginHorizontal: 10,
             padding: 10,
             backgroundColor: Colors["shady-50"],
-            borderRadius: 15,
+            borderRadius: 30,
           }}
         >
           <View style={styles.input}>
@@ -243,6 +243,7 @@ export function Map() {
                   }}
                   style={{
                     paddingVertical: 10,
+                    paddingHorizontal: 5,
                     borderBottomWidth: 1,
                     borderColor: Colors["shady-300"],
                   }}
@@ -253,13 +254,40 @@ export function Map() {
             />
           )}
         </View>
+      </SafeAreaView>
+      <View
+        style={{
+          position: "absolute",
+          bottom: 100,
+          right: 20,
+          backgroundColor: Colors["shady-50"],
+          paddingHorizontal: 10,
+          paddingVertical: 15,
+          gap: 20,
+          borderRadius: 30,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            router.navigate("/starred-station");
+          }}
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "flex-end",
+          }}
+        >
+          <FontAwesome6
+            name="heart-circle-bolt"
+            size={24}
+            color={Colors["shady-950"]}
+          />
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={getLocation}
           style={{
-            marginHorizontal: 15,
-            marginTop: 15,
             display: "flex",
-            alignItems: "flex-end",
+            alignItems: "center",
             justifyContent: "center",
           }}
         >
@@ -269,18 +297,7 @@ export function Map() {
             color={Colors["shady-950"]}
           />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {router.navigate("/starred-station")}}
-          style={{
-            marginHorizontal: 15,
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "flex-end",
-          }}
-        >
-          <FontAwesome6 name="heart-circle-bolt" size={24} color={Colors["shady-950"]} />
-        </TouchableOpacity>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }
@@ -329,7 +346,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 10,
-    borderRadius: 14,
+    borderRadius: 30,
     borderColor: Colors["shady-300"],
     borderWidth: 1,
     backgroundColor: Colors["shady-200"],

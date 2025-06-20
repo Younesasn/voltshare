@@ -1,12 +1,11 @@
-import BackButton from "@/components/BackButton";
 import Button from "@/components/Button";
 import { Station } from "@/interfaces/Station";
 import { getStarredStations } from "@/services/StationService";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { useNavigation } from "expo-router";
-import { useEffect, useState } from "react";
+import { useNavigation, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -17,6 +16,7 @@ import {
 
 export default function StarredStation() {
   const navigation = useNavigation();
+  const router = useRouter();
   const [station, setStation] = useState<Station[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -62,65 +62,71 @@ export default function StarredStation() {
           navigation.goBack();
         }}
       />
-      <ThemedText variant="title">Bornes favorites</ThemedText>
-      <FlatList
-        data={station}
-        ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-        renderItem={({ item }) => (
-          <View style={styles.card} key={item.id}>
-            <View
-              style={{
-                flexDirection: "row",
-                gap: 10,
-                alignItems: "center",
-              }}
-            >
-              <Image
-                source={require("../assets/images/borne.avif")}
-                width={80}
-                height={80}
-                style={{ borderRadius: 10 }}
-              />
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <View style={{ width: 160 }}>
-                  <ThemedText>{item?.name}</ThemedText>
-                  <ThemedText>{item?.adress}</ThemedText>
-                </View>
-
+      {station?.length > 0 ? (
+        <>
+          <ThemedText variant="title">Bornes favorites</ThemedText>
+          <FlatList
+            data={station}
+            style={{ height: "88%" }}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+            renderItem={({ item }) => (
+              <View style={styles.card} key={item.id}>
                 <View>
-                  <View>
-                    <ThemedText variant="lilText">
-                      Puissance : {item?.power}kW
-                    </ThemedText>
+                  <Image
+                    source={require("../assets/images/borne.avif")}
+                    style={{
+                      borderTopLeftRadius: 10,
+                      borderTopRightRadius: 10,
+                      width: "100%",
+                      height: 150,
+                    }}
+                  />
+                  <View style={{ padding: 10, gap: 15 }}>
+                    <View style={{ gap: 10 }}>
+                      <View>
+                        <ThemedText>{item?.name}</ThemedText>
+                        <ThemedText>{item?.adress}</ThemedText>
+                      </View>
+                      <View>
+                        <ThemedText>Puissance : {item?.power}kW</ThemedText>
+                        <ThemedText>Tarif : {item?.price}€/h</ThemedText>
+                      </View>
+                    </View>
+                    <Button
+                      title="Voir"
+                      onPress={() => {
+                        router.back();
+                        router.navigate(`./borne-details/${item.id}`);
+                      }}
+                    />
                   </View>
-                  <View>
-                    <ThemedText variant="lilText">
-                      Tarif : {item?.price}€/h
-                    </ThemedText>
-                  </View>
-                  <Button title="Voir" />
                 </View>
               </View>
-            </View>
-          </View>
-        )}
-      />
+            )}
+          />
+        </>
+      ) : (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            height: "88%",
+          }}
+        >
+          <ThemedText variant="title">
+            Pas de borne mise en favorite.
+          </ThemedText>
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    width: "100%",
     backgroundColor: "#f5f5f5",
     borderRadius: 10,
-    padding: 12,
     borderWidth: 1,
     borderColor: Colors["shady-700"],
     flexDirection: "column",
