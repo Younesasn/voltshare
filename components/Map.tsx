@@ -22,6 +22,7 @@ import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useStations } from "@/context/StationContext";
+import { getPosition } from "@/utils/getPosition";
 
 export function Map() {
   const { stations, loading, refreshStations } = useStations();
@@ -44,15 +45,9 @@ export function Map() {
   const delta = 0.0421;
 
   const getLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      return;
-    }
-
-    const location = await Location.getCurrentPositionAsync();
-    setLocation(location);
-
-    if (mapRef.current) {
+    const location = await getPosition();
+    if (location && mapRef.current) {
+      setLocation(location);
       mapRef.current.animateToRegion(
         {
           latitude: location.coords.latitude,
@@ -112,19 +107,14 @@ export function Map() {
     getLocation();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors["shady-700"]} />
-      </View>
-    );
-  }
-
   return (
     <View style={{ flex: 1 }}>
       <MapView
         ref={mapRef}
-        showsUserLocation={true}
+        showsUserLocation
+        followsUserLocation
+        loadingEnabled={loading}
+        onUserLocationChange={getPosition}
         userInterfaceStyle="light"
         style={styles.map}
         initialRegion={{

@@ -22,12 +22,14 @@ import {
   removeFavouriteStation,
 } from "@/services/StationService";
 import Toast from "react-native-toast-message";
+import MapView, { Marker } from "react-native-maps";
 
 export default function BorneDetailsScreen() {
   const { id } = useLocalSearchParams();
   const newId = parseInt(id as string);
   const [station, setStation] = useState<Station | null>(null);
   const [starredStations, setStarredStations] = useState<Station[]>([]);
+  const delta = 0.0221;
 
   useEffect(() => {
     getStationById(newId)
@@ -146,7 +148,7 @@ export default function BorneDetailsScreen() {
           )}
         </View>
 
-        <View style={{marginBottom: 20}}>
+        <View style={{ marginBottom: 20 }}>
           <ThemedText>{station?.description}</ThemedText>
         </View>
 
@@ -184,12 +186,32 @@ export default function BorneDetailsScreen() {
           </View>
         </View>
 
+        {station?.latitude && station.longitude ? (
+          <MapView
+            style={{ height: 200, width: "100%", borderRadius: 15 }}
+            initialRegion={{
+              latitude: station?.latitude,
+              longitude: station?.longitude,
+              latitudeDelta: delta,
+              longitudeDelta: delta,
+            }}
+          >
+            <Marker
+              coordinate={{
+                latitude: station?.latitude,
+                longitude: station?.longitude,
+              }}
+            />
+          </MapView>
+        ) : null}
+
         <View
           style={{
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
+            marginTop: 30,
           }}
         >
           <View
