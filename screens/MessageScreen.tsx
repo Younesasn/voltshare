@@ -59,7 +59,7 @@ export default function MessageScreen() {
             <View key={index} style={styles.cardWrapper}>
               <TouchableOpacity
                 onPress={() => {
-                  router.push("/conversations");
+                  router.push("/conversations/34");
                 }}
                 style={styles.card}
               >
