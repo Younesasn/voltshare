@@ -87,7 +87,7 @@ api.interceptors.request.use(async (config: any) => {
   console.log(
     `⏱️ Temps écoulé depuis la connexion : ${diffInSeconds} secondes`
   );
-
+// console.log(token)
   const isExpired = dayjs().isAfter(dayjs.unix(Number(expiresAt)));
 
   if (isExpired) {
@@ -96,7 +96,8 @@ api.interceptors.request.use(async (config: any) => {
     return config;
   }
 
-  if (diffInSeconds > 59) {
+  // 2h59 = 10799s / à remplacer avant prod pour 59s
+  if (diffInSeconds > 10799) {
     if (!isRefreshing) {
       isRefreshing = true;
       refreshTokenRequest(refreshToken);
