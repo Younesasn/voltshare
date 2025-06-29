@@ -4,7 +4,7 @@ import { Reservation } from "./Reservation";
 import { Station } from "./Station";
 
 export interface User extends ApiResponse {
-  id?: number;
+  id: number;
   firstname: string;
   lastname: string;
   email: string;

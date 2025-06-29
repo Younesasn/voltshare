@@ -16,35 +16,81 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import EventSource from "react-native-sse";
 import FeatherIcon from "@expo/vector-icons/Feather";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Message } from "@/interfaces/Message";
+import { Message, SendMessage } from "@/interfaces/Message";
 import moment from "moment";
-import { getConversation } from "@/services/MessageService";
+import { sendMessage } from "@/services/MessageService";
+import { z } from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { User } from "@/interfaces/User";
+import { getConversation } from "@/services/ConversationService";
 
-export default function Conversation() {
+moment.locale("fr");
+
+export default function ConversationScreen() {
   const { user } = useAuth();
   const { id } = useLocalSearchParams();
-  const otherId = parseInt(id as string);
+  const conversationId = parseInt(id as string);
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const flatListRef = useRef<FlatList>(null);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const [otherUser, setOtherUser] = useState<User>();
+  const [isInverted, setIsInverted] = useState<boolean>(true);
+  const schema = z.object({
+    message: z.string().min(1, "Veuillez écrire un message"),
+  });
+  const { control, handleSubmit, setValue } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      message: "",
+    },
+  });
 
+  // A l'aide de l'id de la conversation, il faut la récup, puis récupérer l'hôte pour faire afficher ses infos
   const getData = async () => {
     try {
       setIsLoading(true);
-      const res = await getConversation(otherId);
-      setMessages(res.data);
-      // console.log(res.data);
+      const dataConversation = await getConversation(conversationId);
+      setOtherUser(
+        user?.id !== dataConversation.data?.host.id
+          ? dataConversation.data?.host
+          : dataConversation.data?.customer
+      );
+      setMessages(dataConversation.data.messages);
       setIsLoading(false);
     } catch (e: any) {
       console.log("Error :" + e.getMessage());
     }
   };
 
+  const send = async ({ message }: { message: string }) => {
+    try {
+      setIsLoading(true);
+      const messageObject: SendMessage = {
+        sender: user,
+        receiver: otherUser,
+        content: message,
+        conversation: `/api/conversations/${conversationId}`,
+        sendAt: new Date(),
+      };
+      await sendMessage(messageObject);
+      setValue("message", "");
+      setIsLoading(false);
+    } catch (e) {
+      console.log("Error : " + e);
+    }
+  };
+
   useEffect(() => {
     getData();
-    const topic = `messages/${Math.min(user?.id!, otherId)}_${Math.max(user?.id!, otherId)}`;
+  }, []);
+
+  useEffect(() => {
+    if (!user?.id || !otherUser?.id) return;
+    const topic = `messages/${Math.min(user.id, otherUser.id)}_${Math.max(user.id, otherUser.id)}`;
     const url = `${process.env.EXPO_PUBLIC_MERCURE_URL}?topic=${topic}`;
     const es = new EventSource(url, {
       headers: {
@@ -53,15 +99,15 @@ export default function Conversation() {
     });
 
     es.addEventListener("message", (event) => {
-      console.log("Message reçu : ", event.data);
       const data = JSON.parse(event.data!);
+      console.log(JSON.parse(event.data!));
       setMessages((prev) => [...prev, data]);
     });
 
     return () => {
       es.close();
     };
-  }, []);
+  }, [user?.id, otherUser?.id]);
 
   const scrollToEnd = () => {
     flatListRef.current?.scrollToEnd({ animated: true });
@@ -72,7 +118,6 @@ export default function Conversation() {
       return sendAt;
     }
     if (sendAt && typeof sendAt === "object" && sendAt.date) {
-      // Format Mercure
       return sendAt.date.replace(" ", "T");
     }
     return "";
@@ -107,16 +152,17 @@ export default function Conversation() {
                 width: 50,
                 height: 50,
                 borderRadius: 50,
+                borderWidth: 1,
               }}
               source={{
-                uri: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2.5&w=256&h=256&q=80",
+                uri: otherUser?.avatar,
               }}
             />
-            <ThemedText>Morgan Booster</ThemedText>
+            <ThemedText>
+              {otherUser?.firstname} {otherUser?.lastname}
+            </ThemedText>
           </View>
         </SafeAreaView>
-
-        {/* FlatList des messages */}
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -126,14 +172,10 @@ export default function Conversation() {
             ref={flatListRef}
             data={messages}
             keyExtractor={(item) => item.id.toString()}
-            // ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
             contentContainerStyle={{ padding: 10, paddingBottom: 20 }}
             style={{ flex: 1 }}
             renderItem={({ item }) => {
-              const isMe =
-                typeof item.sender === "string"
-                  ? user?.id === Number(item.sender.split("/")[3])
-                  : user?.id === item.sender;
+              const isMe = user?.id === item.sender.id;
               return (
                 <View
                   style={{
@@ -150,7 +192,7 @@ export default function Conversation() {
                   <ThemedText
                     style={{ fontSize: 10, color: "#888", marginTop: 4 }}
                   >
-                    {moment(parseSendAt(item.sendAt)).format("dddd DD MMMM yyyy HH:mm")}
+                    {moment(parseSendAt(item.sendAt)).format("HH:mm")}
                   </ThemedText>
                 </View>
               );
@@ -163,9 +205,46 @@ export default function Conversation() {
                 scrollToEnd();
               }
             }}
+            // inverted={isInverted}
           />
-          <SafeAreaView style={{ paddingHorizontal: 10, paddingTop: -60 }}>
-            <TextInput style={styles.input} placeholder="Message" />
+          <SafeAreaView
+            style={{
+              paddingHorizontal: 10,
+              paddingTop: -60,
+            }}
+          >
+            <Controller
+              control={control}
+              name="message"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.input}>
+                  <TextInput
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    style={{ flex: 1, paddingRight: 1 }}
+                    placeholder="Message"
+                  />
+                  {value.length >= 1 ? (
+                    <TouchableOpacity
+                      style={{
+                        paddingHorizontal: 15,
+                        paddingVertical: 7,
+                        borderRadius: 20,
+                        backgroundColor: Colors["shady-950"],
+                      }}
+                      onPress={handleSubmit(send)}
+                    >
+                      <AntDesign
+                        name="arrowup"
+                        size={22}
+                        color={Colors["shady-50"]}
+                      />
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
+              )}
+            />
           </SafeAreaView>
         </KeyboardAvoidingView>
       </View>
@@ -183,6 +262,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     height: 45,
     borderRadius: 30,
-    paddingHorizontal: 18,
+    paddingLeft: 18,
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingRight: 4
   },
 });

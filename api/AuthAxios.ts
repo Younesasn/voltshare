@@ -87,7 +87,7 @@ api.interceptors.request.use(async (config: any) => {
   console.log(
     `⏱️ Temps écoulé depuis la connexion : ${diffInSeconds} secondes`
   );
-// console.log(token)
+  // console.log(token);
   const isExpired = dayjs().isAfter(dayjs.unix(Number(expiresAt)));
 
   if (isExpired) {

@@ -1,5 +1,6 @@
 import { ThemedText } from "@/themes/ThemedText";
 import {
+  FlatList,
   Image,
   ScrollView,
   StyleSheet,
@@ -10,42 +11,28 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import FeatherIcon from "@expo/vector-icons/Feather";
 import { Colors } from "@/themes/Colors";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { Conversation } from "@/interfaces/Conversation";
+import { getAllConversations } from "@/services/ConversationService";
+import { useAuth } from "@/context/AuthContext";
 
 export default function MessageScreen() {
   const router = useRouter();
-  const items = [
-    {
-      img: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2.5&w=256&h=256&q=80",
-      name: "Nick Miller",
-      message: "Looking forward to our collaboration!",
-    },
-    {
-      img: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
-      name: "Ashley",
-      message: "Amazing!! 🔥🔥🔥",
-    },
-    {
-      img: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80",
-      name: "Max",
-      message: "Appreciate the opportunity to connect and share insights.",
-    },
-    {
-      img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=988&q=80",
-      name: "Schmidt",
-      message: "Let's bring creativity to the forefront of our discussions.",
-    },
-    {
-      img: "https://images.unsplash.com/photo-1553240799-36bbf332a5c3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80",
-      name: "Dwight",
-      message: "Excited to explore opportunities for collaboration.",
-    },
-    {
-      img: "https://images.unsplash.com/photo-1573497019236-17f8177b81e8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80",
-      name: "Amy",
-      message: "Eager to contribute and make a positive impact.",
-    },
-  ];
-  items.push(...items);
+  const { user } = useAuth();
+  const [conversations, setConversations] = useState<Conversation[]>();
+
+  const getData = async () => {
+    try {
+      const res = await getAllConversations();
+      setConversations(res.data);
+    } catch (e) {
+      console.log("Error : " + e);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -53,30 +40,35 @@ export default function MessageScreen() {
         <View style={styles.headerTop}></View>
         <ThemedText variant="logo">Messages</ThemedText>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {items.map(({ name, message, img }, index) => {
+      <FlatList
+        data={conversations}
+        renderItem={({ item, index }) => {
           return (
             <View key={index} style={styles.cardWrapper}>
               <TouchableOpacity
                 onPress={() => {
-                  router.push("/conversations/34");
+                  router.push(`/conversations/${item.id}`);
                 }}
                 style={styles.card}
               >
-                <Image
+                {/* <Image
                   alt=""
                   resizeMode="cover"
-                  source={{ uri: img }}
+                  source={{ uri: item }}
                   style={styles.cardImg}
-                />
+                /> */}
                 <View style={styles.cardBody}>
-                  <ThemedText>{name}</ThemedText>
+                  <ThemedText>
+                    {user?.id === item.customer.id
+                      ? item.host.firstname + " " + item.host.lastname
+                      : item.customer.firstname + " " + item.customer.lastname}
+                  </ThemedText>
                   <ThemedText
                     ellipsizeMode="tail"
                     numberOfLines={1}
                     style={styles.textPreview}
                   >
-                    {message}
+                    {/* {item} */} Coucou
                   </ThemedText>
                 </View>
                 <View style={styles.cardIcon}>
@@ -89,7 +81,9 @@ export default function MessageScreen() {
               </TouchableOpacity>
             </View>
           );
-        })}
+        }}
+      />
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ paddingVertical: 30 }} />
       </ScrollView>
     </SafeAreaView>
