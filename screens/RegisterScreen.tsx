@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { UserRegister } from "@/interfaces/User";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -42,7 +42,10 @@ const schema = z
 export default function RegisterScreen() {
   const router = useRouter();
   const { onRegister } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isVisiblePass, setIsVisiblePass] = useState<boolean>(false);
+  const [isVisibleConfirmPass, setIsVisibleConfirmPass] =
+    useState<boolean>(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
 
   const {
@@ -164,15 +167,32 @@ export default function RegisterScreen() {
                     control={control}
                     name="password"
                     render={({ field: { onChange, onBlur, value } }) => (
-                      <TextInput
-                        style={styles.input}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}
-                        placeholder="Mot de passe"
-                        placeholderTextColor={Colors["shady-900"]}
-                        secureTextEntry
-                      />
+                      <View style={styles.input}>
+                        <TextInput
+                          onBlur={onBlur}
+                          style={{ width: "90%" }}
+                          onChangeText={onChange}
+                          value={value}
+                          placeholder="Mot de passe"
+                          placeholderTextColor={Colors["shady-900"]}
+                          secureTextEntry={!isVisiblePass}
+                        />
+                        <TouchableOpacity
+                          onPress={() => {
+                            setIsVisiblePass(!isVisiblePass);
+                          }}
+                        >
+                          {isVisiblePass ? (
+                            <FontAwesome6
+                              name="eye-slash"
+                              size={20}
+                              color="black"
+                            />
+                          ) : (
+                            <FontAwesome6 name="eye" size={20} color="black" />
+                          )}
+                        </TouchableOpacity>
+                      </View>
                     )}
                   />
                   {errors.password && (
@@ -184,15 +204,32 @@ export default function RegisterScreen() {
                     control={control}
                     name="confirmPassword"
                     render={({ field: { onChange, onBlur, value } }) => (
-                      <TextInput
-                        style={styles.input}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}
-                        placeholder="Confirmer le mot de passe"
-                        placeholderTextColor={Colors["shady-900"]}
-                        secureTextEntry
-                      />
+                      <View style={styles.input}>
+                        <TextInput
+                          onBlur={onBlur}
+                          style={{ width: "90%" }}
+                          onChangeText={onChange}
+                          value={value}
+                          placeholder="Confirmez le mot de passe"
+                          placeholderTextColor={Colors["shady-900"]}
+                          secureTextEntry={!isVisibleConfirmPass}
+                        />
+                        <TouchableOpacity
+                          onPress={() => {
+                            setIsVisibleConfirmPass(!isVisibleConfirmPass);
+                          }}
+                        >
+                          {isVisibleConfirmPass ? (
+                            <FontAwesome6
+                              name="eye-slash"
+                              size={20}
+                              color="black"
+                            />
+                          ) : (
+                            <FontAwesome6 name="eye" size={20} color="black" />
+                          )}
+                        </TouchableOpacity>
+                      </View>
                     )}
                   />
                   {errors.confirmPassword && (
@@ -291,7 +328,9 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   input: {
-    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderColor: Colors["shady-900"],
     borderWidth: 1,
     height: 50,

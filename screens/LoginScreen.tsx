@@ -20,6 +20,7 @@ import { useForm, Controller } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/components/Button";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 const schema = z.object({
   email: z
@@ -35,7 +36,8 @@ type LoginFormValues = z.infer<typeof schema>;
 
 export default function LoginScreen() {
   const [loginError, setLoginError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const { onLogin } = useAuth();
   const router = useRouter();
 
@@ -128,15 +130,32 @@ export default function LoginScreen() {
                 name="password"
                 rules={{ required: true }}
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    style={styles.input}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    placeholder="Mot de passe"
-                    placeholderTextColor={Colors["shady-900"]}
-                    secureTextEntry
-                  />
+                  <View style={styles.input}>
+                    <TextInput
+                      style={{ width: "90%" }}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      placeholder="Mot de passe"
+                      placeholderTextColor={Colors["shady-900"]}
+                      secureTextEntry={!isVisible}
+                    />
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIsVisible(!isVisible);
+                      }}
+                    >
+                      {isVisible ? (
+                        <FontAwesome6
+                          name="eye-slash"
+                          size={20}
+                          color="black"
+                        />
+                      ) : (
+                        <FontAwesome6 name="eye" size={20} color="black" />
+                      )}
+                    </TouchableOpacity>
+                  </View>
                 )}
               />
               {errors.password && (
@@ -205,6 +224,9 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   input: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderColor: Colors["shady-900"],
     borderWidth: 1,
     height: 50,
