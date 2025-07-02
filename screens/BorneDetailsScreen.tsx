@@ -188,6 +188,7 @@ export default function BorneDetailsScreen() {
 
         {station?.latitude && station.longitude ? (
           <MapView
+            userInterfaceStyle="light"
             style={{ height: 200, width: "100%", borderRadius: 15 }}
             initialRegion={{
               latitude: station?.latitude,
