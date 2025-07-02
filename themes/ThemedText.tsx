@@ -5,6 +5,10 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "bold",
   },
+  subtitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
   text: {
     fontSize: 16,
     fontWeight: "regular",

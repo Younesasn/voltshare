@@ -10,8 +10,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import FeatherIcon from "@expo/vector-icons/Feather";
 import { Colors } from "@/themes/Colors";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import { Conversation } from "@/interfaces/Conversation";
 import { getAllConversations } from "@/services/ConversationService";
 import { useAuth } from "@/context/AuthContext";
@@ -30,9 +30,29 @@ export default function MessageScreen() {
     }
   };
 
-  useEffect(() => {
-    getData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getData();
+    }, [])
+  );
+
+  if (!conversations) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1,
+          gap: 10,
+        }}
+      >
+        <ThemedText variant="title">Pas de conversations en cours.</ThemedText>
+        <ThemedText>
+          Passez une réservation pour entamer une discussion !
+        </ThemedText>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -51,12 +71,18 @@ export default function MessageScreen() {
                 }}
                 style={styles.card}
               >
-                {/* <Image
+                <Image
                   alt=""
                   resizeMode="cover"
-                  source={{ uri: item }}
+                  source={{
+                    uri:
+                      (user?.id === item.customer.id
+                        ? item.host.avatar
+                        : item.customer.avatar) ??
+                      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                  }}
                   style={styles.cardImg}
-                /> */}
+                />
                 <View style={styles.cardBody}>
                   <ThemedText>
                     {user?.id === item.customer.id
@@ -68,7 +94,11 @@ export default function MessageScreen() {
                     numberOfLines={1}
                     style={styles.textPreview}
                   >
-                    {/* {item} */} Coucou
+                    {item.messages[item.messages.length - 1].sender.id ===
+                    user?.id
+                      ? "Moi : "
+                      : "À vous : "}
+                    {item.messages[item.messages.length - 1].content}
                   </ThemedText>
                 </View>
                 <View style={styles.cardIcon}>
@@ -124,6 +154,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 9999,
     marginRight: 12,
+    borderWidth: 1,
   },
   cardBody: {
     maxWidth: "100%",

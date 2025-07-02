@@ -1,4 +1,6 @@
 import { AuthProvider } from "@/context/AuthContext";
+import "@/global.css";
+import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { StationProvider } from "@/context/StationContext";
 import { SplashScreen, Stack } from "expo-router";
 import { useFonts } from "expo-font";
@@ -28,31 +30,31 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <StationProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen
-            name="success-payment"
-            options={{
-              gestureEnabled: false,
-            }}
-          />
-          <Stack.Screen
-            name="(app)"
-            options={{ animation: "none", gestureEnabled: false }}
-          />
-          <Stack.Screen
-            name="add-car"
-            options={{ presentation: "transparentModal" }}
-          />
-          <Stack.Screen
-            name="login"
-            options={{ animation: "none", gestureEnabled: false }}
-          />
-        </Stack>
-        <Toast />
-        <StatusBar animated translucent barStyle="dark-content" />
-      </StationProvider>
-    </AuthProvider>
+    <GluestackUIProvider mode="light"><AuthProvider>
+        <StationProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen
+              name="success-payment"
+              options={{
+                gestureEnabled: false,
+              }}
+            />
+            <Stack.Screen
+              name="(app)"
+              options={{ animation: "none", gestureEnabled: false }}
+            />
+            <Stack.Screen
+              name="add-car"
+              options={{ presentation: "transparentModal" }}
+            />
+            <Stack.Screen
+              name="login"
+              options={{ animation: "none", gestureEnabled: false }}
+            />
+          </Stack>
+          <Toast />
+          <StatusBar animated translucent barStyle="dark-content" />
+        </StationProvider>
+      </AuthProvider></GluestackUIProvider>
   );
 }

@@ -80,7 +80,12 @@ export default function Checkout() {
       console.log("Résultat de session Stripe :", result);
 
       if (result.type === "success") {
-        if (!user?.cars?.[0]?.id || !startSlot || !endSlot || !station?.["@id"]) {
+        if (
+          !user?.cars?.[0]?.id ||
+          !startSlot ||
+          !endSlot ||
+          !station?.["@id"]
+        ) {
           console.error("Données manquantes pour la réservation");
           return;
         }
@@ -94,18 +99,18 @@ export default function Checkout() {
           price: tarification(),
           station: station["@id"],
         });
-        
+
         // Rafraîchir toutes les données
         await refreshAllData();
-        
+
         console.log(res.data);
-        
+
         // Nettoyer les données temporaires
         await SecureStore.deleteItemAsync("timeslots");
         await SecureStore.deleteItemAsync("station");
-        
+
         // Rediriger vers la page de succès au lieu d'une URL externe
-        
+
         navigation.goBack();
         router.push("/success-payment");
       } else if (result.type === "cancel") {
@@ -233,7 +238,9 @@ export default function Checkout() {
                     size={40}
                     color={Colors["shady-950"]}
                   />
-                  <ThemedText>{user?.cars?.[0]?.model ?? "Aucun véhicule"}</ThemedText>
+                  <ThemedText>
+                    {user?.cars?.[0]?.model ?? "Aucun véhicule"}
+                  </ThemedText>
                 </View>
               </View>
             </View>
@@ -253,8 +260,8 @@ export default function Checkout() {
             </View>
           </View>
         </View>
+        <Button title="Payer" onPress={createUrlSession} />
       </View>
-      <Button title="Payer" onPress={createUrlSession} />
     </SafeAreaView>
   );
 }
