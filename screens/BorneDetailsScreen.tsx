@@ -103,11 +103,7 @@ export default function BorneDetailsScreen() {
   return (
     <View style={styles.container}>
       {/* Image */}
-      <Image
-        style={styles.image}
-        source={require("../assets/images/borne.avif")}
-        alt="image test"
-      />
+      <Image style={styles.image} src={station?.picture} alt="image test" />
       {/* Retour Button */}
       <TouchableOpacity style={styles.back} onPress={() => router.back()}>
         <Ionicons

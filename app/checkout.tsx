@@ -150,7 +150,7 @@ export default function Checkout() {
                   }}
                 >
                   <Image
-                    source={require("../assets/images/borne.avif")}
+                    src={station?.picture}
                     width={80}
                     height={80}
                     style={{ borderRadius: 10 }}

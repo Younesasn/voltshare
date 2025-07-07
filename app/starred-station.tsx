@@ -45,8 +45,10 @@ export default function StarredStation() {
           width: "100%",
           justifyContent: "center",
           alignItems: "center",
+          gap: 10,
         }}
       >
+        <ThemedText variant="title">Chargement des bornes...</ThemedText>
         <ActivityIndicator color={Colors["shady-900"]} />
       </View>
     );
@@ -72,35 +74,33 @@ export default function StarredStation() {
             ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
             renderItem={({ item }) => (
               <View style={styles.card} key={item.id}>
-                <View>
-                  <Image
-                    source={require("../assets/images/borne.avif")}
-                    style={{
-                      borderTopLeftRadius: 10,
-                      borderTopRightRadius: 10,
-                      width: "100%",
-                      height: 150,
+                <Image
+                  src={item.picture}
+                  style={{
+                    borderTopLeftRadius: 10,
+                    borderTopRightRadius: 10,
+                    width: "100%",
+                    height: 150,
+                  }}
+                />
+                <View style={{ padding: 10, gap: 15 }}>
+                  <View style={{ gap: 10 }}>
+                    <View>
+                      <ThemedText>{item?.name}</ThemedText>
+                      <ThemedText>{item?.adress}</ThemedText>
+                    </View>
+                    <View>
+                      <ThemedText>Puissance : {item?.power}kW</ThemedText>
+                      <ThemedText>Tarif : {item?.price}€/h</ThemedText>
+                    </View>
+                  </View>
+                  <Button
+                    title="Voir"
+                    onPress={() => {
+                      router.back();
+                      router.navigate(`./borne-details/${item.id}`);
                     }}
                   />
-                  <View style={{ padding: 10, gap: 15 }}>
-                    <View style={{ gap: 10 }}>
-                      <View>
-                        <ThemedText>{item?.name}</ThemedText>
-                        <ThemedText>{item?.adress}</ThemedText>
-                      </View>
-                      <View>
-                        <ThemedText>Puissance : {item?.power}kW</ThemedText>
-                        <ThemedText>Tarif : {item?.price}€/h</ThemedText>
-                      </View>
-                    </View>
-                    <Button
-                      title="Voir"
-                      onPress={() => {
-                        router.back();
-                        router.navigate(`./borne-details/${item.id}`);
-                      }}
-                    />
-                  </View>
                 </View>
               </View>
             )}
