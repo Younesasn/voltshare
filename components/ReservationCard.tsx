@@ -49,11 +49,11 @@ export default function ReservationCard({
         { flexDirection: "row", padding: 16, gap: 6 },
       ]}
     >
-      <View style={{ width: "100%" }}>
+      <View style={{ width: "100%", gap: 8 }}>
         <ThemedText color={inProgress ? "" : "white"} variant="subtitle">
           {reservation.station.name}
         </ThemedText>
-        <View style={{ gap: 1, width: "100%" }}>
+        <View style={{ gap: 2, width: "100%" }}>
           <View style={styles.row}>
             <Ionicons
               name="location-outline"
@@ -72,6 +72,16 @@ export default function ReservationCard({
             />
             <ThemedText color={inProgress ? "" : "white"}>
               {moment(reservation.startTime).format("dddd DD MMMM")}
+            </ThemedText>
+          </View>
+          <View style={styles.row}>
+            <FontAwesome
+              name="euro"
+              size={20}
+              color={inProgress ? "" : "#fff"}
+            />
+            <ThemedText color={inProgress ? "" : "white"}>
+              {reservation.price} euros
             </ThemedText>
           </View>
           <View style={styles.row}>

@@ -14,6 +14,7 @@ export interface Station extends ApiResponse {
   adress: string;
   type: string;
   user: User;
+  isActive: boolean
   reservations: Reservation[];
 }
 
