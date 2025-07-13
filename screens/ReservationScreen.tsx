@@ -1,8 +1,7 @@
 import { ChipGroup } from "@/components/chip/Chip";
-import { Reservation } from "@/interfaces/Reservation";
 import { ThemedText } from "@/themes/ThemedText";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   FlatList,
   ScrollView,
@@ -20,17 +19,13 @@ import Animated, {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
-import { Station } from "@/interfaces/Station";
 import ReservationCard from "@/components/ReservationCard";
 import StationCard from "@/components/StationCard";
 
 const ReservationScreen = () => {
   const [index, setIndex] = useState<number>(0);
   const [displayedLabel, setDisplayedLabel] = useState<string>("Client");
-  const [displayedCount, setDisplayedCount] = useState<number>(42);
   const fadeAnim = useSharedValue<number>(1);
-  const [reservations, setReservations] = useState<Reservation[]>();
-  const [stations, setStations] = useState<Station[]>();
   const { user } = useAuth();
   const chipData = [
     {
@@ -48,7 +43,6 @@ const ReservationScreen = () => {
   ];
   const updateDisplayedContent = (newIndex: number) => {
     setDisplayedLabel(chipData[newIndex].label);
-    setDisplayedCount(Math.floor(Math.random() * 100) + 1);
   };
   const handleChipChange = (newIndex: number) => {
     if (newIndex !== index) {
@@ -71,15 +65,10 @@ const ReservationScreen = () => {
       ],
     };
   });
-  useEffect(() => {
-    setReservations(user?.reservations?.reverse());
-    setStations(user?.stations);
-    updateDisplayedContent(0);
-  }, []);
 
   const clientComponent = (
     <Animated.View style={[animatedStyle, { gap: 10 }]}>
-      {reservations?.map((reservation) => {
+      {user?.reservations?.reverse()?.map((reservation) => {
         if (moment().isBetween(reservation.startTime, reservation.endTime)) {
           return (
             <View key={reservation.id}>
@@ -90,9 +79,9 @@ const ReservationScreen = () => {
         }
       })}
       {(() => {
-        const prochainesReservations = reservations?.filter((reservation) =>
-          moment(reservation.startTime).isAfter()
-        );
+        const prochainesReservations = user?.reservations
+          ?.reverse()
+          ?.filter((reservation) => moment(reservation.startTime).isAfter());
         if (prochainesReservations && prochainesReservations.length > 0) {
           return (
             <View style={{ gap: 10 }}>
@@ -116,7 +105,7 @@ const ReservationScreen = () => {
           </ThemedText>
         </View>
         <FlatList
-          data={reservations}
+          data={user?.reservations?.reverse()}
           scrollEnabled={false}
           renderItem={({ item }) => <ReservationCard reservation={item} />}
         />
@@ -125,14 +114,14 @@ const ReservationScreen = () => {
   );
 
   const hoteComponent =
-    stations && stations.length >= 1 ? (
-      <Animated.View style={[animatedStyle, { gap: 10 }]}>
+    user?.stations && user.stations.length >= 1 ? (
+      <Animated.View style={[animatedStyle, { gap: 10, marginBottom: 80 }]}>
         <ThemedText variant="title">Mes bornes</ThemedText>
         <FlatList
           scrollEnabled={false}
-          data={stations}
+          data={user.stations}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-          renderItem={({ item }) => <StationCard station={item} />}
+          renderItem={({ item }) => <StationCard station={item} edit />}
           keyExtractor={(item) => item.id.toString()}
         />
       </Animated.View>

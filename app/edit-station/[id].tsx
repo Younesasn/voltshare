@@ -1,20 +1,22 @@
 import BackButton from "@/components/BackButton";
 import Button from "@/components/Button";
 import { useAuth } from "@/context/AuthContext";
-import { StationRegister } from "@/interfaces/Station";
+import { Station } from "@/interfaces/Station";
 import { searchLocation } from "@/services/SearchLocationService";
-import { createStation } from "@/services/StationService";
+import { getStationById, updateStation } from "@/services/StationService";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+  Alert,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -22,20 +24,22 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
-export default function StationsFormScreen() {
-  const [coords, setCoords] = useState<number[] | null>(null);
-  const [searchResult, setSearchResult] = useState<[] | null>(null);
-  const [loading, setLoading] = useState(false);
+export default function EditStation() {
+  const { id } = useLocalSearchParams();
+  const newId = parseInt(id as string);
   const { user, onRefreshing } = useAuth();
+  const [station, setStation] = useState<Station | null>(null);
+  const [searchResult, setSearchResult] = useState<[] | null>(null);
+  const [coords, setCoords] = useState<number[] | null>(null);
+  const [loading, setLoading] = useState(false);
   const schema = z.object({
     name: z.string().min(1, "Le nom de la borne est requise"),
     adress: z.string().min(1, "L'adresse est requise"),
-    price: z.string().regex(/^[0-9]+$/, "Prix invalide"),
-    power: z.string().regex(/^[0-9]+$/, "Puissance invalide"),
+    price: z.number().min(1, "Prix invalide"),
+    power: z.number().min(1, "Puissance invalide"),
     description: z.string().min(1, "La description est requise"),
     defaultMessage: z
       .string()
@@ -45,10 +49,18 @@ export default function StationsFormScreen() {
     control,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: {},
+    defaultValues: {
+      name: "",
+      adress: "",
+      price: 0,
+      power: 0,
+      description: "",
+      defaultMessage: "",
+    },
   });
 
   const fetchSearchSuggestions = async (query: string) => {
@@ -67,53 +79,69 @@ export default function StationsFormScreen() {
     }
   };
 
-  const onSubmit = async ({
-    name,
-    adress,
-    price,
-    power,
-    description,
-    defaultMessage,
-  }: {
+  const onSubmit = async (data: {
     name: string;
     adress: string;
-    price: string;
-    power: string;
+    price: number;
+    power: number;
     description: string;
     defaultMessage: string;
   }) => {
     try {
       setLoading(true);
-      const station: StationRegister = {
-        name,
-        latitude: coords ? coords[1] : 0,
-        longitude: coords ? coords[0] : 0,
-        adress,
-        price: Number(price),
-        power: Number(power),
-        description,
-        type: "Type 2",
+      const res = await searchLocation(data.adress);
+      const features = res.data.features;
+      await updateStation(station?.id as number, {
         user: `/api/users/${user?.id}`,
-        picture: "Super photo",
-        defaultMessage,
-      };
-      await createStation(station);
+        adress: data.adress ?? station?.adress,
+        description: data.adress ?? station?.adress,
+        name: data.name ?? station?.name,
+        picture: station?.picture as string,
+        power: data.power ?? station?.power,
+        price: data.price ?? station?.price,
+        type: station?.type ?? "Type 2",
+        latitude: coords ? coords[1] : features[0].geometry.coordinates[1],
+        longitude: coords ? coords[0] : features[0].geometry.coordinates[0],
+        defaultMessage: data.defaultMessage ?? station?.defaultMessage,
+      });
       await onRefreshing!();
       setLoading(false);
       Toast.show({
         autoHide: true,
         type: "success",
-        text1: "Borne créée !",
-        text2: "Votre borne a été créée avec succès.",
+        text1: "Borne modifiée !",
+        text2: "Votre borne a été modifiée avec succès.",
         position: "top",
         visibilityTime: 5000,
       });
       router.back();
-    } catch (error: any) {
+    } catch (error) {
       setLoading(false);
-      console.log(error.message);
+      console.log(error);
     }
   };
+
+  useEffect(() => {
+    getStationById(newId)
+      .then((res) => {
+        setStation(res.data);
+        reset({
+          name: res.data.name || "",
+          adress: res.data.adress || "",
+          price: res.data.price || 0,
+          power: res.data.power || 0,
+          description: res.data.description || "",
+          defaultMessage: res.data.defaultMessage || "",
+        });
+      })
+      .catch((err) => {
+        console.error(
+          "Erreur lors de la récupération du station :",
+          err.message
+        );
+        Alert.alert("Erreur", "Impossible de récupérer les informations.");
+      });
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -126,7 +154,7 @@ export default function StationsFormScreen() {
           <BackButton />
           <ScrollView>
             <View style={{ flex: 1, gap: 20 }}>
-              <ThemedText variant="title">Créez votre borne</ThemedText>
+              <ThemedText variant="title">Modifiez votre borne</ThemedText>
               <View style={{ display: "flex", gap: 20 }}>
                 <View style={{ gap: 10 }}>
                   <ThemedText>Nom de la borne</ThemedText>
@@ -211,10 +239,12 @@ export default function StationsFormScreen() {
                     name="description"
                     render={({ field: { onChange, onBlur, value } }) => (
                       <TextInput
-                        style={styles.input}
+                        style={[styles.input, { height: 100 }]}
                         onBlur={onBlur}
                         onChangeText={onChange}
                         value={value}
+                        multiline
+                        numberOfLines={10}
                         placeholder="Description"
                         placeholderTextColor={Colors["shady-900"]}
                       />
@@ -235,8 +265,9 @@ export default function StationsFormScreen() {
                       <TextInput
                         style={styles.input}
                         onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}
+                        onChangeText={(text) => onChange(Number(text))}
+                        inputMode="numeric"
+                        value={value !== undefined ? String(value) : ""}
                         placeholder="22"
                         placeholderTextColor={Colors["shady-900"]}
                         keyboardType="numeric"
@@ -250,7 +281,7 @@ export default function StationsFormScreen() {
                   )}
                 </View>
                 <View style={{ gap: 10 }}>
-                  <ThemedText>Prix/h</ThemedText>
+                  <ThemedText>Prix/h (€)</ThemedText>
                   <Controller
                     control={control}
                     name="price"
@@ -258,8 +289,8 @@ export default function StationsFormScreen() {
                       <TextInput
                         style={styles.input}
                         onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}
+                        onChangeText={(text) => onChange(Number(text))}
+                        value={value !== undefined ? String(value) : ""}
                         placeholder="5"
                         placeholderTextColor={Colors["shady-900"]}
                         keyboardType="numeric"

@@ -1,16 +1,17 @@
 import { Station } from "@/interfaces/Station";
 import { ThemedText } from "@/themes/ThemedText";
 import { View, Image, StyleSheet } from "react-native";
-import React from "react";
+import React, { FC } from "react";
 import { Colors } from "@/themes/Colors";
 import Button from "./Button";
 import { router } from "expo-router";
 
 interface StationCardProps {
   station: Station;
+  edit?: boolean;
 }
 
-const StationCard: React.FC<StationCardProps> = ({ station }) => {
+const StationCard: FC<StationCardProps> = ({ station, edit }) => {
   return (
     <View style={styles.card} key={station.id}>
       <Image
@@ -34,9 +35,11 @@ const StationCard: React.FC<StationCardProps> = ({ station }) => {
           </View>
         </View>
         <Button
-          title="Voir"
+          title={!edit ? "Voir" : "Modifier"}
           onPress={() => {
-            router.navigate(`../borne-details/${station.id}`);
+            edit
+              ? router.navigate(`../edit-station/${station.id}`)
+              : router.navigate(`./borne-details/${station.id}`);
           }}
         />
       </View>

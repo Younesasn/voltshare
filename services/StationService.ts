@@ -26,3 +26,9 @@ export function removeFavouriteStation(id: number) {
 export function createStation(station: StationRegister) {
   return api.post(`${apiUrl}/api/stations`, station);
 }
+
+export function updateStation(id: number, station: StationRegister) {
+  return api.patch(`${apiUrl}/api/stations/${id}`, station, {
+    headers: { "Content-Type": "application/merge-patch+json" },
+  });
+}

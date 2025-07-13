@@ -49,7 +49,6 @@ export default function ConversationScreen() {
     },
   });
 
-  // A l'aide de l'id de la conversation, il faut la récup, puis récupérer l'hôte pour faire afficher ses infos
   const getData = async () => {
     try {
       setIsLoading(true);
@@ -207,7 +206,6 @@ export default function ConversationScreen() {
                 scrollToEnd();
               }
             }}
-            // inverted={isInverted}
           />
           <SafeAreaView
             style={{
@@ -268,6 +266,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    paddingRight: 4
+    paddingRight: 4,
+    gap: 8
   },
 });

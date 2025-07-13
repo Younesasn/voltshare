@@ -12,9 +12,10 @@ export interface Station extends ApiResponse {
   power: number;
   price: number;
   adress: string;
+  defaultMessage: string;
   type: string;
   user: User;
-  isActive: boolean
+  isActive: boolean;
   reservations: Reservation[];
 }
 
@@ -26,6 +27,7 @@ export interface StationRegister {
   picture: string
   price: number
   power: number
+  defaultMessage: string
   description: string
   type: string
   user: string
