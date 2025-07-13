@@ -1,4 +1,4 @@
-import { User, UserPasswordToken, UserRegister } from "./User";
+import { User, UserRegister } from "./User";
 
 export interface AuthProps {
   authState?: { token: string | null; authenticated: boolean | null };

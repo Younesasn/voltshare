@@ -1,14 +1,12 @@
 import Button from "@/components/Button";
 import { useAuth } from "@/context/AuthContext";
-import { UserPasswordToken } from "@/interfaces/User";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Controller, set, useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,

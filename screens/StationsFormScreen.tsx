@@ -8,7 +8,7 @@ import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   FlatList,

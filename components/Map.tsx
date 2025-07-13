@@ -1,6 +1,5 @@
 import { Colors } from "@/themes/Colors";
 import {
-  ActivityIndicator,
   FlatList,
   Keyboard,
   StyleSheet,

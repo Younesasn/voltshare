@@ -3,8 +3,6 @@ import { ThemedText } from "@/themes/ThemedText";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
   TextInput,

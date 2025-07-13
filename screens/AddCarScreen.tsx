@@ -1,12 +1,10 @@
 import Button from "@/components/Button";
 import { useAuth } from "@/context/AuthContext";
-import { Car } from "@/interfaces/Car";
-import { User } from "@/interfaces/User";
 import { createCar } from "@/services/CarService";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { router, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
