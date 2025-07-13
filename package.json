@@ -27,7 +27,7 @@
     "axios": "^1.9.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "dayjs": "^1.11.13",
-    "expo": "~53.0.17",
+    "expo": "~53.0.19",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
     "expo-device": "^7.1.4",
