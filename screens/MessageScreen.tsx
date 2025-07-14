@@ -71,18 +71,31 @@ export default function MessageScreen() {
                 }}
                 style={styles.card}
               >
-                <Image
-                  alt=""
-                  resizeMode="cover"
-                  source={{
-                    uri:
-                      (user?.id === item.customer.id
-                        ? item.host.avatar
-                        : item.customer.avatar) ??
-                      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                  }}
-                  style={styles.cardImg}
-                />
+                <View>
+                  <Image
+                    alt=""
+                    resizeMode="cover"
+                    source={{
+                      uri:
+                        (user?.id === item.customer.id
+                          ? item.host.avatar
+                          : item.customer.avatar) ??
+                        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                    }}
+                    style={styles.cardImg}
+                  />
+                  <View
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 5,
+                      backgroundColor: item.open ? "#39E930" : "red",
+                      position: "absolute",
+                      bottom: 0,
+                      right: 16,
+                    }}
+                  />
+                </View>
                 <View style={styles.cardBody}>
                   <ThemedText>
                     {user?.id === item.customer.id

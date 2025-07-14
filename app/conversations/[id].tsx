@@ -34,6 +34,7 @@ export default function ConversationScreen() {
   const conversationId = parseInt(id as string);
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const flatListRef = useRef<FlatList>(null);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
@@ -54,11 +55,12 @@ export default function ConversationScreen() {
       setIsLoading(true);
       const dataConversation = await getConversation(conversationId);
       setOtherUser(
-        user?.id !== dataConversation.data?.host.id
+        user?.id !== dataConversation.data?.host.id // Si user n'est pas l'hôte
           ? dataConversation.data?.host
           : dataConversation.data?.customer
       );
       setMessages(dataConversation.data.messages);
+      setIsOpen(dataConversation.data.open);
       setIsLoading(false);
     } catch (e: any) {
       console.log("Error :" + e.getMessage());
@@ -99,7 +101,6 @@ export default function ConversationScreen() {
 
     es.addEventListener("message", (event) => {
       const data = JSON.parse(event.data!);
-      console.log(JSON.parse(event.data!));
       setMessages((prev) => [...prev, data]);
     });
 
@@ -213,38 +214,48 @@ export default function ConversationScreen() {
               paddingTop: -60,
             }}
           >
-            <Controller
-              control={control}
-              name="message"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <View style={styles.input}>
-                  <TextInput
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    style={{ flex: 1, paddingRight: 1 }}
-                    placeholder="Message"
-                  />
-                  {value.length >= 1 ? (
-                    <TouchableOpacity
-                      style={{
-                        paddingHorizontal: 15,
-                        paddingVertical: 7,
-                        borderRadius: 20,
-                        backgroundColor: Colors["shady-950"],
-                      }}
-                      onPress={handleSubmit(send)}
-                    >
-                      <AntDesign
-                        name="arrowup"
-                        size={22}
-                        color={Colors["shady-50"]}
-                      />
-                    </TouchableOpacity>
-                  ) : null}
-                </View>
-              )}
-            />
+            {isOpen ? (
+              <Controller
+                control={control}
+                name="message"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <View style={styles.input}>
+                    <TextInput
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      style={{ flex: 1, paddingRight: 1 }}
+                      placeholder="Message"
+                    />
+                    {value.length >= 1 ? (
+                      <TouchableOpacity
+                        style={{
+                          paddingHorizontal: 15,
+                          paddingVertical: 7,
+                          borderRadius: 20,
+                          backgroundColor: Colors["shady-950"],
+                        }}
+                        onPress={handleSubmit(send)}
+                      >
+                        <AntDesign
+                          name="arrowup"
+                          size={22}
+                          color={Colors["shady-50"]}
+                        />
+                      </TouchableOpacity>
+                    ) : null}
+                  </View>
+                )}
+              />
+            ) : (
+              <View
+                style={{
+                  alignItems: "center",
+                }}
+              >
+                <ThemedText color={Colors["shady-800"]}>Conversation fermée</ThemedText>
+              </View>
+            )}
           </SafeAreaView>
         </KeyboardAvoidingView>
       </View>
@@ -267,6 +278,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingRight: 4,
-    gap: 8
+    gap: 8,
   },
 });
