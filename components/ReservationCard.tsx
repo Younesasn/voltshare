@@ -23,6 +23,7 @@ export default function ReservationCard({
     if (p > 100) p = 100;
     return p;
   });
+  const imageUrl = process.env.EXPO_PUBLIC_API_URL + "/images/station/";
 
   useEffect(() => {
     if (!inProgress) return;
@@ -143,7 +144,7 @@ export default function ReservationCard({
         <View style={{ marginTop: 10 }}>{cardContent}</View>
       ) : (
         <ImageBackground
-          source={{ uri: reservation.station.picture }}
+          src={imageUrl + reservation.station.picture}
           imageStyle={styles.image}
           style={styles.imageContainer}
           blurRadius={6}

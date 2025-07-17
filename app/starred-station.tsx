@@ -19,6 +19,7 @@ export default function StarredStation() {
   const router = useRouter();
   const [station, setStation] = useState<Station[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const imageUrl = process.env.EXPO_PUBLIC_API_URL + "/images/station/";
 
   const getData = async () => {
     try {
@@ -75,7 +76,7 @@ export default function StarredStation() {
             renderItem={({ item }) => (
               <View style={styles.card} key={item.id}>
                 <Image
-                  src={item.picture}
+                  src={imageUrl + item.picture}
                   style={{
                     borderTopLeftRadius: 10,
                     borderTopRightRadius: 10,

@@ -111,9 +111,7 @@ export function Map() {
       <MapView
         ref={mapRef}
         showsUserLocation
-        followsUserLocation
         loadingEnabled={loading}
-        onUserLocationChange={getPosition}
         userInterfaceStyle="light"
         style={styles.map}
         initialRegion={{
@@ -133,7 +131,7 @@ export function Map() {
             key="recherche"
           />
         )}
-        {stations?.map((borne) => {
+        {stations.map((borne) => {
           return (
             <Marker
               coordinate={{

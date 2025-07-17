@@ -30,7 +30,8 @@ export default function RootLayout() {
   }
 
   return (
-    <GluestackUIProvider mode="light"><AuthProvider>
+    <GluestackUIProvider mode="light">
+      <AuthProvider>
         <StationProvider>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen
@@ -55,6 +56,7 @@ export default function RootLayout() {
           <Toast />
           <StatusBar animated translucent barStyle="dark-content" />
         </StationProvider>
-      </AuthProvider></GluestackUIProvider>
+      </AuthProvider>
+    </GluestackUIProvider>
   );
 }

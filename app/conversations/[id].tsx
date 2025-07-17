@@ -39,7 +39,6 @@ export default function ConversationScreen() {
   const flatListRef = useRef<FlatList>(null);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
   const [otherUser, setOtherUser] = useState<User>();
-  const [isInverted, setIsInverted] = useState<boolean>(true);
   const schema = z.object({
     message: z.string().min(1, "Veuillez écrire un message"),
   });
@@ -226,6 +225,8 @@ export default function ConversationScreen() {
                       value={value}
                       style={{ flex: 1, paddingRight: 1 }}
                       placeholder="Message"
+                      onSubmitEditing={handleSubmit(send)}
+                      returnKeyType="send"
                     />
                     {value.length >= 1 ? (
                       <TouchableOpacity
@@ -253,7 +254,9 @@ export default function ConversationScreen() {
                   alignItems: "center",
                 }}
               >
-                <ThemedText color={Colors["shady-800"]}>Conversation fermée</ThemedText>
+                <ThemedText color={Colors["shady-800"]}>
+                  Conversation fermée
+                </ThemedText>
               </View>
             )}
           </SafeAreaView>
