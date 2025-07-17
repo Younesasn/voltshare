@@ -12,10 +12,11 @@ interface StationCardProps {
 }
 
 const StationCard: FC<StationCardProps> = ({ station, edit }) => {
+  const imageUrl = process.env.EXPO_PUBLIC_API_URL + "/images/station/";
   return (
     <View style={styles.card} key={station.id}>
       <Image
-        src={station.picture}
+        src={imageUrl + station.picture}
         style={{
           borderTopLeftRadius: 10,
           borderTopRightRadius: 10,
@@ -37,9 +38,9 @@ const StationCard: FC<StationCardProps> = ({ station, edit }) => {
         <Button
           title={!edit ? "Voir" : "Modifier"}
           onPress={() => {
-            edit
+            !edit
               ? router.navigate(`../edit-station/${station.id}`)
-              : router.navigate(`./borne-details/${station.id}`);
+              : router.navigate(`/borne-details/${station.id}`);
           }}
         />
       </View>

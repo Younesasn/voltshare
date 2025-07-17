@@ -4,8 +4,23 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
-export default function BackButton() {
-  return (
+export default function BackButton({ onPress }: { onPress?: () => any }) {
+  return onPress ? (
+    <TouchableOpacity
+      style={styles.back}
+      onPress={() => {
+        onPress();
+        router.back();
+      }}
+    >
+      <Ionicons
+        name="arrow-back-outline"
+        size={24}
+        color={Colors["shady-950"]}
+      />
+      <ThemedText>Retour</ThemedText>
+    </TouchableOpacity>
+  ) : (
     <TouchableOpacity style={styles.back} onPress={() => router.back()}>
       <Ionicons
         name="arrow-back-outline"

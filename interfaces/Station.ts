@@ -24,11 +24,9 @@ export interface StationRegister {
   latitude: number
   longitude: number
   adress: string
-  picture: string
   price: number
   power: number
+  imageFile?: any
   defaultMessage: string
   description: string
-  type: string
-  user: string
 }

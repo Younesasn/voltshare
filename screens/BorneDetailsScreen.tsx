@@ -13,48 +13,57 @@ import Entypo from "@expo/vector-icons/Entypo";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Button from "@/components/Button";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Station } from "@/interfaces/Station";
 import {
   addFavouriteStation,
+  deleteStation,
   getStarredStations,
   getStationById,
   removeFavouriteStation,
 } from "@/services/StationService";
 import Toast from "react-native-toast-message";
 import MapView, { Marker } from "react-native-maps";
+import { useAuth } from "@/context/AuthContext";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function BorneDetailsScreen() {
   const { id } = useLocalSearchParams();
   const newId = parseInt(id as string);
+  const { user, onRefreshing } = useAuth();
   const [station, setStation] = useState<Station | null>(null);
   const [starredStations, setStarredStations] = useState<Station[]>([]);
+  const [isOwner, setIsOwner] = useState<boolean>(false);
   const delta = 0.0221;
+  const imageUrl = process.env.EXPO_PUBLIC_API_URL + "/images/station/";
 
-  useEffect(() => {
-    getStationById(newId)
-      .then((res) => {
-        setStation(res.data);
-      })
-      .catch((err) => {
-        console.error(
-          "Erreur lors de la récupération du station :",
-          err.message
-        );
-        Alert.alert("Erreur", "Impossible de récupérer les informations.");
-      });
-    getStarredStations()
-      .then((res) => {
-        setStarredStations(res.data);
-      })
-      .catch((err) => {
-        console.error(
-          "Erreur lors de la récupération des stations favoris :",
-          err.message
-        );
-        Alert.alert("Erreur", "Impossible de récupérer les informations.");
-      });
-  }, [newId]);
+  useFocusEffect(
+    useCallback(() => {
+      getStationById(newId)
+        .then((res) => {
+          setStation(res.data);
+          setIsOwner(user?.id === res.data.user.id);
+        })
+        .catch((err) => {
+          console.error(
+            "Erreur lors de la récupération du station :",
+            err.message
+          );
+          Alert.alert("Erreur", "Impossible de récupérer les informations.");
+        });
+      getStarredStations()
+        .then((res) => {
+          setStarredStations(res.data);
+        })
+        .catch((err) => {
+          console.error(
+            "Erreur lors de la récupération des stations favoris :",
+            err.message
+          );
+          Alert.alert("Erreur", "Impossible de récupérer les informations.");
+        });
+    }, [newId])
+  );
 
   const addStarredStation = async () => {
     try {
@@ -100,11 +109,31 @@ export default function BorneDetailsScreen() {
     }
   };
 
+  const onDeleteStation = async () => {
+    try {
+      await deleteStation(newId);
+      Toast.show({
+        autoHide: true,
+        type: "success",
+        text1: "Borne supprimée ! 🗑️",
+        text2: "La borne a bien été supprimée.",
+        position: "top",
+        visibilityTime: 5000,
+      });
+      await onRefreshing!();
+      router.back();
+    } catch (error: any) {
+      console.warn("Error : " + error.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {/* Image */}
-      <Image style={styles.image} src={station?.picture} alt="image test" />
-      {/* Retour Button */}
+      <Image
+        style={styles.image}
+        src={imageUrl + station?.picture}
+        alt="image test"
+      />
       <TouchableOpacity style={styles.back} onPress={() => router.back()}>
         <Ionicons
           name="arrow-back-outline"
@@ -201,36 +230,76 @@ export default function BorneDetailsScreen() {
             />
           </MapView>
         ) : null}
-
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: 30,
-          }}
-        >
+        {isOwner ? (
           <View
             style={{
               display: "flex",
               flexDirection: "row",
-              gap: 4,
+              justifyContent: "space-between",
               alignItems: "center",
+              marginTop: 30,
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                padding: 10,
+                borderRadius: 20,
+                borderWidth: 1,
+                borderColor: Colors["shady-950"],
+              }}
+              onPress={() => {
+                router.push(`/edit-station/${station?.id}`);
+              }}
+            >
+              <ThemedText variant="lilText">Modifier ma borne</ThemedText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                padding: 10,
+                borderRadius: 20,
+                borderWidth: 1,
+                borderColor: "red"
+              }}
+              onPress={onDeleteStation}
+            >
+              <ThemedText variant="lilText" color="red">Supprimer ma borne</ThemedText>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: 30,
             }}
           >
             <View
               style={{
-                width: 8,
-                height: 8,
-                borderRadius: 5,
-                backgroundColor: "#39E930",
+                display: "flex",
+                flexDirection: "row",
+                gap: 4,
+                alignItems: "center",
               }}
+            >
+              <View
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 5,
+                  backgroundColor: "#39E930",
+                }}
+              />
+              <ThemedText variant="lilText">Disponible</ThemedText>
+            </View>
+            <Button
+              link="./choice-date/[id]"
+              title="Réserver"
+              id={station?.id}
             />
-            <ThemedText variant="lilText">Disponible</ThemedText>
           </View>
-          <Button link="./choice-date/[id]" title="Réserver" id={station?.id} />
-        </View>
+        )}
       </ScrollView>
     </View>
   );

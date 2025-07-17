@@ -46,7 +46,6 @@ export default function AccountScreen() {
 
   const onDeleteCar = (carId: number) => {
     if (!user?.id) return;
-
     Alert.alert(
       "Suppression de la voiture",
       "Êtes-vous sûr de vouloir supprimer votre voiture ?",
@@ -60,7 +59,6 @@ export default function AccountScreen() {
               await deleteCar(carId);
               await onRefreshing!();
               setIsLoading(false);
-
               Toast.show({
                 type: "success",
                 text1: "Voiture supprimée",
@@ -118,7 +116,7 @@ export default function AccountScreen() {
             }}
           >
             <Image
-              src={user?.avatar ? url + user?.avatar : url + "avatar.avif"}
+              src={user?.avatar ? url + user?.avatar : url + "avatar.jpg"}
               style={styles.image}
             />
             <View>
@@ -135,7 +133,7 @@ export default function AccountScreen() {
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{ paddingVertical: 20, gap: 20, marginBottom: 200 }}>
             <View style={{ gap: 10 }}>
-              <ThemedText variant="title">Informations Personnelles</ThemedText>
+              <ThemedText variant="title">Informations personnelles</ThemedText>
               <TouchableOpacity
                 onPress={() => router.navigate("/informations-form")}
               >
@@ -188,12 +186,20 @@ export default function AccountScreen() {
                   data={user?.stations}
                   ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
                   renderItem={({ item }) => (
-                    <View>
+                    <TouchableOpacity
+                      style={styles.buttonCar}
+                      onPress={() => router.push(`/borne-details/${item.id}`)}
+                    >
                       <ThemedText>{item.name}</ThemedText>
-                      <ThemedText>{item.adress}</ThemedText>
-                    </View>
+                      <MaterialIcons
+                        name="ev-station"
+                        size={40}
+                        color={Colors["shady-950"]}
+                      />
+                    </TouchableOpacity>
                   )}
                   keyExtractor={(item) => item.id?.toString()}
+                  style={{ paddingVertical: 10 }}
                 />
               )}
               <TouchableOpacity
@@ -220,11 +226,11 @@ export default function AccountScreen() {
                   padding: 10,
                   borderRadius: 20,
                   borderWidth: 1,
-                  borderColor: Colors["shady-950"],
+                  borderColor: "red",
                 }}
                 onPress={deleteAccount}
               >
-                <ThemedText variant="lilText">Supprimer mon compte</ThemedText>
+                <ThemedText variant="lilText" color="red">Supprimer mon compte</ThemedText>
               </TouchableOpacity>
             </View>
           </View>
@@ -243,7 +249,7 @@ const styles = StyleSheet.create({
     height: 80,
     width: 80,
     borderRadius: 40,
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: Colors["shady-950"],
   },
   buttonCar: {

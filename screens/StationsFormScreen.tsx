@@ -12,6 +12,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   FlatList,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -25,11 +26,24 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
+import * as ImagePicker from "expo-image-picker";
+
+const MAX_FILE_SIZE = 1024 * 1024 * 5;
+const ACCEPTED_IMAGE_MIME_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
 
 export default function StationsFormScreen() {
   const [coords, setCoords] = useState<number[] | null>(null);
   const [searchResult, setSearchResult] = useState<[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<any | undefined>(
+    undefined
+  );
+  const [errorImage, setErrorImage] = useState<string | null>(null);
   const { user, onRefreshing } = useAuth();
   const schema = z.object({
     name: z.string().min(1, "Le nom de la borne est requise"),
@@ -40,7 +54,17 @@ export default function StationsFormScreen() {
     defaultMessage: z
       .string()
       .min(1, "Le message envoyé par défaut est requis"),
+    // imageFile: z
+    //   .any()
+    //   .refine((files) => {
+    //     return files?.[0]?.size <= MAX_FILE_SIZE;
+    //   }, `La taille maximum est de 5MB.`)
+    //   .refine(
+    //     (files) => ACCEPTED_IMAGE_MIME_TYPES.includes(files?.[0]?.type),
+    //     "Seuls les fichiers de type .jpg, .jpeg, .png & .webp fsont supportés."
+    //   ),
   });
+  type StationFormData = z.infer<typeof schema>;
   const {
     control,
     handleSubmit,
@@ -50,7 +74,6 @@ export default function StationsFormScreen() {
     resolver: zodResolver(schema),
     defaultValues: {},
   });
-
   const fetchSearchSuggestions = async (query: string) => {
     if (!query || query.length < 4) {
       setSearchResult(null);
@@ -67,6 +90,19 @@ export default function StationsFormScreen() {
     }
   };
 
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      quality: 1,
+    });
+    if (result.canceled) {
+      return;
+    }
+    setSelectedImage(result.assets[0]);
+    setErrorImage(null);
+  };
+
   const onSubmit = async ({
     name,
     adress,
@@ -74,15 +110,12 @@ export default function StationsFormScreen() {
     power,
     description,
     defaultMessage,
-  }: {
-    name: string;
-    adress: string;
-    price: string;
-    power: string;
-    description: string;
-    defaultMessage: string;
-  }) => {
+  }: StationFormData) => {
     try {
+      if (!selectedImage) {
+        setErrorImage("Image requis");
+        return;
+      }
       setLoading(true);
       const station: StationRegister = {
         name,
@@ -92,10 +125,8 @@ export default function StationsFormScreen() {
         price: Number(price),
         power: Number(power),
         description,
-        type: "Type 2",
-        user: `/api/users/${user?.id}`,
-        picture: "Super photo",
         defaultMessage,
+        imageFile: selectedImage,
       };
       await createStation(station);
       await onRefreshing!();
@@ -123,10 +154,29 @@ export default function StationsFormScreen() {
           keyboardVerticalOffset={10}
           style={styles.container}
         >
-          <BackButton />
-          <ScrollView>
-            <View style={{ flex: 1, gap: 20 }}>
+          <BackButton
+            onPress={() => {
+              setSelectedImage(undefined);
+            }}
+          />
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={{ flex: 1, gap: 20, marginBottom: 10 }}>
               <ThemedText variant="title">Créez votre borne</ThemedText>
+              <View style={{ gap: 10 }}>
+                <ThemedText>Image</ThemedText>
+                {selectedImage ? (
+                  <Image
+                    style={styles.image}
+                    source={{ uri: selectedImage.uri }}
+                  />
+                ) : (
+                  <ThemedText>Aucune image seléctionnée</ThemedText>
+                )}
+                {errorImage && (
+                  <ThemedText style={styles.error}>{errorImage}</ThemedText>
+                )}
+                <Button title="Choisir une image" onPress={pickImageAsync} />
+              </View>
               <View style={{ display: "flex", gap: 20 }}>
                 <View style={{ gap: 10 }}>
                   <ThemedText>Nom de la borne</ThemedText>
@@ -250,7 +300,7 @@ export default function StationsFormScreen() {
                   )}
                 </View>
                 <View style={{ gap: 10 }}>
-                  <ThemedText>Prix/h</ThemedText>
+                  <ThemedText>Prix/h (€)</ThemedText>
                   <Controller
                     control={control}
                     name="price"
@@ -275,7 +325,10 @@ export default function StationsFormScreen() {
                 <View style={{ gap: 14 }}>
                   <View style={{ gap: 4 }}>
                     <ThemedText>Message par défaut</ThemedText>
-                    <ThemedText variant="lilText">Ceci est un texte</ThemedText>
+                    <ThemedText>
+                      Ce message sera envoyé après avoir validé une réservation
+                      auprès d'un client
+                    </ThemedText>
                   </View>
                   <Controller
                     control={control}
@@ -327,5 +380,10 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
     fontSize: 12,
+  },
+  image: {
+    width: "100%",
+    height: 250,
+    borderRadius: 18,
   },
 });
