@@ -8,10 +8,9 @@ import { router } from "expo-router";
 
 interface StationCardProps {
   station: Station;
-  edit?: boolean;
 }
 
-const StationCard: FC<StationCardProps> = ({ station, edit }) => {
+const StationCard: FC<StationCardProps> = ({ station }) => {
   const imageUrl = process.env.EXPO_PUBLIC_API_URL + "/images/station/";
   return (
     <View style={styles.card} key={station.id}>
@@ -36,11 +35,9 @@ const StationCard: FC<StationCardProps> = ({ station, edit }) => {
           </View>
         </View>
         <Button
-          title={!edit ? "Voir" : "Modifier"}
+          title={"Voir les réservations"}
           onPress={() => {
-            !edit
-              ? router.navigate(`../edit-station/${station.id}`)
-              : router.navigate(`/borne-details/${station.id}`);
+            router.navigate(`../list-reservations/${station.id}`);
           }}
         />
       </View>

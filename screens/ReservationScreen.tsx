@@ -121,7 +121,9 @@ const ReservationScreen = () => {
           scrollEnabled={false}
           data={user.stations}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-          renderItem={({ item }) => <StationCard station={item} edit />}
+          renderItem={({ item }) => (
+            <StationCard station={item} />
+          )}
           keyExtractor={(item) => item.id.toString()}
         />
       </Animated.View>
