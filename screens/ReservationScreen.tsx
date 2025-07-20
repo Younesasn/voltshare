@@ -19,8 +19,8 @@ import Animated, {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
-import ReservationCard from "@/components/ReservationCard";
 import StationCard from "@/components/StationCard";
+import ReservationCard from "@/components/ReservationCard";
 
 const ReservationScreen = () => {
   const [index, setIndex] = useState<number>(0);
@@ -67,11 +67,11 @@ const ReservationScreen = () => {
   });
 
   const clientComponent = (
-    <Animated.View style={[animatedStyle, { gap: 10 }]}>
+    <Animated.View style={[animatedStyle, { gap: 15 }]}>
       {user?.reservations?.reverse()?.map((reservation) => {
         if (moment().isBetween(reservation.startTime, reservation.endTime)) {
           return (
-            <View key={reservation.id}>
+            <View key={reservation.id} style={{ gap: 10 }}>
               <ThemedText variant="title">Réservation en cours</ThemedText>
               <ReservationCard reservation={reservation} inProgress />
             </View>
@@ -107,6 +107,7 @@ const ReservationScreen = () => {
         <FlatList
           data={user?.reservations?.reverse()}
           scrollEnabled={false}
+          contentContainerStyle={{ gap: 16, paddingVertical: 10 }}
           renderItem={({ item }) => <ReservationCard reservation={item} />}
         />
       </View>
@@ -121,9 +122,7 @@ const ReservationScreen = () => {
           scrollEnabled={false}
           data={user.stations}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-          renderItem={({ item }) => (
-            <StationCard station={item} />
-          )}
+          renderItem={({ item }) => <StationCard station={item} />}
           keyExtractor={(item) => item.id.toString()}
         />
       </Animated.View>
@@ -156,7 +155,9 @@ const ReservationScreen = () => {
             />
           </View>
           <ScrollView showsVerticalScrollIndicator={false}>
-            {displayedLabel === "Client" ? clientComponent : hoteComponent}
+            <View style={{ marginBottom: 60 }}>
+              {displayedLabel === "Client" ? clientComponent : hoteComponent}
+            </View>
           </ScrollView>
         </View>
       </SafeAreaView>

@@ -3,7 +3,6 @@ import { Station } from "@/interfaces/Station";
 import { getStationById } from "@/services/StationService";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
-import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import moment from "moment";
@@ -11,6 +10,7 @@ import { FlatList, StyleSheet, View } from "react-native";
 import Button from "@/components/Button";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BackButton from "@/components/BackButton";
+import Card from "@/components/ReservationCard";
 
 export default function ListReservations() {
   const { id } = useLocalSearchParams();
@@ -27,79 +27,6 @@ export default function ListReservations() {
     getData();
   }, []);
 
-  // Composant pour afficher une réservation
-  const ReservationCard = ({ reservation }: { reservation: Reservation }) => {
-    // Formatage de la date et heure avec moment
-    const date = reservation.startTime
-      ? moment(reservation.startTime)
-      : undefined;
-    const endDate = reservation.endTime
-      ? moment(reservation.endTime)
-      : undefined;
-    const now = moment();
-    // Détermination du statut
-    let statusLabel = "À venir";
-    let statusColor = Colors["shady-800"];
-    if (endDate && now.isAfter(endDate)) {
-      statusLabel = "Terminée";
-      statusColor = "green";
-    } else if (
-      date &&
-      endDate &&
-      now.isBetween(date, endDate, undefined, "[)")
-    ) {
-      statusLabel = "En cours";
-      statusColor = "orange";
-    }
-    return (
-      <View style={styles.card}>
-        <View style={styles.row}>
-          <Ionicons
-            name="person-circle"
-            size={32}
-            color={Colors["shady-700"]}
-          />
-          <View style={{ flex: 1 }}>
-            <ThemedText variant="subtitle">
-              {reservation.user?.firstname} {reservation.user?.lastname}
-            </ThemedText>
-            <ThemedText color={Colors["shady-500"]}>
-              {reservation.user?.email}
-            </ThemedText>
-          </View>
-          <View style={[styles.status, { backgroundColor: statusColor }]}>
-            <ThemedText variant="lilText" color={"white"}>
-              {statusLabel}
-            </ThemedText>
-          </View>
-        </View>
-        <View style={styles.row}>
-          <View
-            style={{ flexDirection: "row", gap: 4, justifyContent: "center" }}
-          >
-            <Ionicons name="calendar" size={18} color={Colors["shady-700"]} />
-            <ThemedText>{date ? date.format("DD MMMM YYYY") : "-"}</ThemedText>
-          </View>
-          <View
-            style={{ flexDirection: "row", gap: 4, justifyContent: "center" }}
-          >
-            <FontAwesome name="euro" size={18} color={Colors["shady-700"]} />
-            <ThemedText>{reservation.price}</ThemedText>
-          </View>
-          <View
-            style={{ flexDirection: "row", gap: 4, justifyContent: "center" }}
-          >
-            <Ionicons name="time" size={18} color={Colors["shady-700"]} />
-            <ThemedText>
-              {date ? date.format("HH:mm") : "-"} -&gt;{" "}
-              {endDate ? endDate.add(1, "hour").format("HH:mm") : "-"}
-            </ThemedText>
-          </View>
-        </View>
-      </View>
-    );
-  };
-
   if (!reservations?.length) {
     return (
       <SafeAreaView style={{ flex: 1, paddingHorizontal: 16 }}>
@@ -108,7 +35,7 @@ export default function ListReservations() {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <ThemedText variant="subtitle">
+          <ThemedText variant="subtitle" isCenter>
             Pas de réservations passées sur cette borne.
           </ThemedText>
         </View>
@@ -131,7 +58,13 @@ export default function ListReservations() {
           keyExtractor={(item) =>
             item.id?.toString() ?? Math.random().toString()
           }
-          renderItem={({ item }) => <ReservationCard reservation={item} />}
+          renderItem={({ item }) => (
+            <Card
+              reservation={item}
+              inProgress={moment().isBetween(item.startTime, item.endTime)}
+              isNotClient
+            />
+          )}
           contentContainerStyle={{ gap: 16, paddingVertical: 16 }}
         />
       </View>
