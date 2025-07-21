@@ -1,6 +1,6 @@
 import { Reservation } from "@/interfaces/Reservation";
 import { Station } from "@/interfaces/Station";
-import { getStationById } from "@/services/StationService";
+import { exportDataStation, getStationById } from "@/services/StationService";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import { useLocalSearchParams } from "expo-router";
@@ -11,6 +11,7 @@ import Button from "@/components/Button";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BackButton from "@/components/BackButton";
 import Card from "@/components/ReservationCard";
+import Toast from "react-native-toast-message";
 
 export default function ListReservations() {
   const { id } = useLocalSearchParams();
@@ -26,6 +27,20 @@ export default function ListReservations() {
   useEffect(() => {
     getData();
   }, []);
+
+  const exportData = async () => {
+    const res = await exportDataStation(newId);
+    if (!res.data) return;
+    Toast.show({
+      autoHide: true,
+      type: "success",
+      text1: "Donées exportées !",
+      text2: "Les données de cette borne vous ont été envoyés par mail.",
+      position: "top",
+      visibilityTime: 5000,
+    });
+    console.log(res.data);
+  };
 
   if (!reservations?.length) {
     return (
@@ -100,12 +115,7 @@ export default function ListReservations() {
             €
           </ThemedText>
         </View>
-        <Button
-          title="Exportez les données"
-          onPress={() => {
-            console.log("export");
-          }}
-        />
+        <Button title="Exportez les données" onPress={exportData} />
       </View>
     </SafeAreaView>
   );

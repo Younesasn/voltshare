@@ -51,21 +51,6 @@ export function createStation(station: StationRegister) {
   });
 }
 
-// export function addPicture(id: number, selectedImage: any) {
-//   const formData = new FormData();
-//   formData.append("imageFile", {
-//     uri: selectedImage.uri,
-//     name: getFilenameFromUri(selectedImage.uri),
-//     type: selectedImage.mimeType || "image/jpeg",
-//   } as any);
-
-//   return api.patch(`/api/stations/${id}`, formData, {
-//     headers: {
-//       "Content-Type": "multipart/form-data",
-//     },
-//   });
-// }
-
 export function updateStation(id: number, station: StationRegister) {
   return api.patch(`${apiUrl}/api/stations/${id}`, station, {
     headers: { "Content-Type": "application/merge-patch+json" },
@@ -74,4 +59,8 @@ export function updateStation(id: number, station: StationRegister) {
 
 export function deleteStation(id: number) {
   return api.delete(`${apiUrl}/api/stations/${id}`);
+}
+
+export function exportDataStation(id: number) {
+  return api.get(`${apiUrl}/api/stations/${id}/export`);
 }
