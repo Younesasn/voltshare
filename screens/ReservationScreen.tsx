@@ -27,6 +27,7 @@ const ReservationScreen = () => {
   const [displayedLabel, setDisplayedLabel] = useState<string>("Client");
   const fadeAnim = useSharedValue<number>(1);
   const { user } = useAuth();
+  const hasStation = !!user?.stations?.length;
   const chipData = [
     {
       label: "Client",
@@ -114,33 +115,18 @@ const ReservationScreen = () => {
     </Animated.View>
   );
 
-  const hoteComponent =
-    user?.stations && user.stations.length >= 1 ? (
-      <Animated.View style={[animatedStyle, { gap: 10, marginBottom: 80 }]}>
-        <ThemedText variant="title">Mes bornes</ThemedText>
-        <FlatList
-          scrollEnabled={false}
-          data={user.stations}
-          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-          renderItem={({ item }) => <StationCard station={item} />}
-          keyExtractor={(item) => item.id.toString()}
-        />
-      </Animated.View>
-    ) : (
-      <Animated.View
-        style={[
-          animatedStyle,
-          {
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-          },
-        ]}
-      >
-        <ThemedText>Pas de bornes</ThemedText>
-      </Animated.View>
-    );
+  const hoteComponent = user?.stations && (
+    <Animated.View style={[animatedStyle, { gap: 10, marginBottom: 80 }]}>
+      <ThemedText variant="title">Mes bornes</ThemedText>
+      <FlatList
+        scrollEnabled={false}
+        data={user.stations}
+        ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+        renderItem={({ item }) => <StationCard station={item} />}
+        keyExtractor={(item) => item.id.toString()}
+      />
+    </Animated.View>
+  );
 
   return (
     <GestureHandlerRootView style={styles.root}>
@@ -150,6 +136,7 @@ const ReservationScreen = () => {
             <ChipGroup
               chips={chipData as any}
               selectedIndex={index}
+              hasStation={hasStation}
               onChange={handleChipChange}
               containerStyle={styles.chipGroupContainer}
             />

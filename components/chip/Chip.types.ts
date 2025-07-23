@@ -13,6 +13,7 @@ export interface ChipGroupProps<T> {
   selectedIndex?: number;
   onChange?: (index: number) => void;
   containerStyle?: StyleProp<ViewStyle>;
+  hasStation?: boolean;
 }
 
 export interface AnimatedChipProps extends ChipItem {

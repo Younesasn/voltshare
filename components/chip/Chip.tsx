@@ -1,4 +1,3 @@
-import { SFSymbol, SymbolView } from "expo-symbols";
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
@@ -10,6 +9,7 @@ export const ChipGroup: React.FC<ChipGroupProps<ChipItem>> = ({
   onChange,
   containerStyle,
   selectedIndex,
+  hasStation,
 }) => {
   const [internalIndex, setInternalIndex] = useState(0);
   const activeIndex = selectedIndex ?? internalIndex;
@@ -25,17 +25,18 @@ export const ChipGroup: React.FC<ChipGroupProps<ChipItem>> = ({
       style={[styles.container, containerStyle]}
       layout={LinearTransition}
     >
-      {chips.map((item, index) => (
-        <AnimatedChip
-          key={index}
-          label={item.label}
-          activeColor={item.activeColor}
-          activeIcon={item.activeIcon}
-          icon={item.icon}
-          isActive={activeIndex === index}
-          onPress={() => handlePress(index)}
-        />
-      ))}
+      {hasStation &&
+        chips.map((item, index) => (
+          <AnimatedChip
+            key={index}
+            label={item.label}
+            activeColor={item.activeColor}
+            activeIcon={item.activeIcon}
+            icon={item.icon}
+            isActive={activeIndex === index}
+            onPress={() => handlePress(index)}
+          />
+        ))}
     </Animated.View>
   );
 };
