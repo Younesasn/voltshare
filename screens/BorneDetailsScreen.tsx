@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Switch,
 } from "react-native";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
@@ -13,7 +14,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Button from "@/components/Button";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Station } from "@/interfaces/Station";
 import {
   addFavouriteStation,
@@ -21,6 +22,7 @@ import {
   getStarredStations,
   getStationById,
   removeFavouriteStation,
+  toggleStation,
 } from "@/services/StationService";
 import Toast from "react-native-toast-message";
 import MapView, { Marker } from "react-native-maps";
@@ -34,6 +36,7 @@ export default function BorneDetailsScreen() {
   const [station, setStation] = useState<Station | null>(null);
   const [starredStations, setStarredStations] = useState<Station[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>(false);
+  const [isEnabled, setIsEnabled] = useState(false);
   const delta = 0.0221;
   const imageUrl = process.env.EXPO_PUBLIC_API_URL + "/images/station/";
 
@@ -42,6 +45,7 @@ export default function BorneDetailsScreen() {
       getStationById(newId)
         .then((res) => {
           setStation(res.data);
+          setIsEnabled(res.data.active);
           setIsOwner(user?.id === res.data.user.id);
         })
         .catch((err) => {
@@ -127,6 +131,33 @@ export default function BorneDetailsScreen() {
     }
   };
 
+  const toggleSwitch = async () => {
+    try {
+      const newValue = !isEnabled;
+      setIsEnabled(newValue);
+      await toggleStation(newId, newValue);
+      newValue
+        ? Toast.show({
+            type: "success",
+            text1: "Borne actif ! ✅",
+            text2:
+              "La borne a bien été activée. Elle sera visible par tout les utilisateurs.",
+            position: "top",
+            visibilityTime: 5000,
+          })
+        : Toast.show({
+            type: "success",
+            text1: "Borne inactif ! ❌",
+            text2:
+              "La borne a bien été désactivée. Elle sera visible pour tout les utilisateurs.",
+            position: "top",
+            visibilityTime: 5000,
+          });
+    } catch (e: any) {
+      console.error("Error : " + e.message());
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -134,7 +165,7 @@ export default function BorneDetailsScreen() {
         src={imageUrl + station?.picture}
         alt="image test"
       />
-      <TouchableOpacity style={styles.back} onPress={() => router.back()}>
+      <TouchableOpacity style={styles.back} onPress={router.back}>
         <Ionicons
           name="arrow-back-outline"
           size={24}
@@ -159,14 +190,14 @@ export default function BorneDetailsScreen() {
           {starredStations.find((station) => station.id === newId) ? (
             <Entypo
               name="star"
-              onPress={() => removeStarredStation()}
+              onPress={removeStarredStation}
               size={24}
               color={Colors["shady-950"]}
             />
           ) : (
             <Entypo
               name="star-outlined"
-              onPress={() => addStarredStation()}
+              onPress={addStarredStation}
               size={24}
               color={Colors["shady-950"]}
             />
@@ -179,38 +210,56 @@ export default function BorneDetailsScreen() {
 
         <View
           style={{
-            display: "flex",
             flexDirection: "row",
+            justifyContent: "space-between",
             alignItems: "center",
-            gap: 8,
             marginBottom: 20,
           }}
         >
-          <MaterialCommunityIcons
-            name="ev-plug-type2"
-            size={40}
-            color={Colors["shady-950"]}
-          />
           <View
             style={{
               display: "flex",
               flexDirection: "row",
-              gap: 4,
               alignItems: "center",
+              gap: 8,
             }}
           >
-            <View>
-              <ThemedText>Type 2</ThemedText>
-              <ThemedText variant="lilText">{station?.power}kW</ThemedText>
-            </View>
-            <ThemedText variant="lilText">•</ThemedText>
-            <View>
-              <ThemedText>{station?.price}€/h</ThemedText>
-              <ThemedText variant="lilText">prix</ThemedText>
+            <MaterialCommunityIcons
+              name="ev-plug-type2"
+              size={40}
+              color={Colors["shady-950"]}
+            />
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 4,
+                alignItems: "center",
+              }}
+            >
+              <View>
+                <ThemedText>Type 2</ThemedText>
+                <ThemedText variant="lilText">{station?.power}kW</ThemedText>
+              </View>
+              <ThemedText variant="lilText">•</ThemedText>
+              <View>
+                <ThemedText>{station?.price}€/h</ThemedText>
+                <ThemedText variant="lilText">prix</ThemedText>
+              </View>
             </View>
           </View>
+          {isOwner && (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <Switch
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={toggleSwitch}
+                value={isEnabled}
+              />
+            </View>
+          )}
         </View>
-
         {station?.latitude && station.longitude ? (
           <MapView
             userInterfaceStyle="light"
@@ -258,11 +307,13 @@ export default function BorneDetailsScreen() {
                 padding: 10,
                 borderRadius: 20,
                 borderWidth: 1,
-                borderColor: "red"
+                borderColor: "red",
               }}
               onPress={onDeleteStation}
             >
-              <ThemedText variant="lilText" color="red">Supprimer ma borne</ThemedText>
+              <ThemedText variant="lilText" color="red">
+                Supprimer ma borne
+              </ThemedText>
             </TouchableOpacity>
           </View>
         ) : (

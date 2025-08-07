@@ -15,7 +15,7 @@ export interface Station extends ApiResponse {
   defaultMessage: string;
   type: string;
   user: User;
-  isActive: boolean;
+  active: boolean;
   reservations: Reservation[];
 }
 

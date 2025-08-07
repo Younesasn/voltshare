@@ -5,7 +5,9 @@ import { Station, StationRegister } from "@/interfaces/Station";
 import { getFilenameFromUri } from "@/utils/getFilenameFromUri";
 
 export function getAllStations() {
-  return api.get<ApiListResponse<Station>>(`${apiUrl}/api/stations`);
+  return api.get<ApiListResponse<Station>>(
+    `${apiUrl}/api/stations?isActive=true`
+  );
 }
 
 export function getStationById(id: number) {
@@ -13,7 +15,7 @@ export function getStationById(id: number) {
 }
 
 export function getStarredStations() {
-  return api.get<Station[]>(`${apiUrl}/api/stations-starred`);
+  return api.get<Station[]>(`${apiUrl}/api/stations-starred?isActive=true`);
 }
 
 export function addFavouriteStation(id: number) {
@@ -63,4 +65,14 @@ export function deleteStation(id: number) {
 
 export function exportDataStation(id: number) {
   return api.get(`${apiUrl}/api/stations/${id}/export`);
+}
+
+export function toggleStation(id: number, isActive: boolean) {
+  return api.patch(
+    `${apiUrl}/api/stations/${id}`,
+    { isActive: isActive },
+    {
+      headers: { "Content-Type": "application/merge-patch+json" },
+    }
+  );
 }
