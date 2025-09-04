@@ -252,6 +252,11 @@ export default function BorneDetailsScreen() {
             <View
               style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
             >
+              {isEnabled ? (
+                <ThemedText>Actif</ThemedText>
+              ) : (
+                <ThemedText>Inactif</ThemedText>
+              )}
               <Switch
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={toggleSwitch}
