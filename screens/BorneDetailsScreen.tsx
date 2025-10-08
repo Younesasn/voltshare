@@ -176,7 +176,7 @@ export default function BorneDetailsScreen() {
       <ScrollView style={styles.content}>
         <View style={styles.contentTitle}>
           <View>
-            <View>
+            <View style={{width: "90%"}}>
               <ThemedText variant="title">{station?.name}</ThemedText>
             </View>
             <View

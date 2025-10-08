@@ -21,7 +21,8 @@ import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useStations } from "@/context/StationContext";
-import { getPosition } from "@/utils/getPosition";
+import { getPosition } from "@/lib/getPosition";
+import { GlassView } from "expo-glass-effect";
 
 export function Map() {
   const { stations, loading, refreshStations } = useStations();
@@ -169,15 +170,15 @@ export function Map() {
       </MapView>
 
       <SafeAreaView style={{ position: "absolute" }}>
-        <View
+        <GlassView
+          glassEffectStyle="clear"
           style={{
             marginHorizontal: 10,
             padding: 10,
-            backgroundColor: Colors["shady-50"],
             borderRadius: 30,
           }}
         >
-          <View style={styles.input}>
+          <GlassView style={styles.input} glassEffectStyle="clear">
             <Controller
               control={control}
               name="address"
@@ -190,7 +191,7 @@ export function Map() {
                   }}
                   value={value}
                   placeholder="Rechercher un lieu..."
-                  placeholderTextColor={Colors["shady-900"]}
+                  placeholderTextColor={"black"}
                   style={{ width: "90%", height: 40 }}
                 />
               )}
@@ -198,7 +199,7 @@ export function Map() {
             <TouchableOpacity onPress={handleSubmit(getSearchLocation)}>
               <MaterialIcons name="search" size={24} color="black" />
             </TouchableOpacity>
-          </View>
+          </GlassView>
 
           {searchResult && (
             <FlatList
@@ -240,14 +241,14 @@ export function Map() {
               )}
             />
           )}
-        </View>
+        </GlassView>
       </SafeAreaView>
-      <View
+      <GlassView
+        glassEffectStyle="clear"
         style={{
           position: "absolute",
           bottom: 100,
           right: 20,
-          backgroundColor: Colors["shady-50"],
           paddingHorizontal: 10,
           paddingVertical: 15,
           gap: 20,
@@ -284,7 +285,7 @@ export function Map() {
             color={Colors["shady-950"]}
           />
         </TouchableOpacity>
-      </View>
+      </GlassView>
     </View>
   );
 }
@@ -334,8 +335,5 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 10,
     borderRadius: 30,
-    borderColor: Colors["shady-300"],
-    borderWidth: 1,
-    backgroundColor: Colors["shady-200"],
   },
 });

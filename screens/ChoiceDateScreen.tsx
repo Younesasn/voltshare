@@ -49,7 +49,7 @@ const hours = [
 ];
 
 const { width } = Dimensions.get("window");
-moment.defineLocale("fr", {
+moment.updateLocale("fr", {
   weekdaysShort: ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"],
   weekdaysMin: ["D", "L", "M", "M", "J", "V", "S"],
   weekdays: [
@@ -98,8 +98,8 @@ moment.defineLocale("fr", {
 export default function ChoiceDateScreen() {
   const { id } = useLocalSearchParams();
   const newId = parseInt(id as string);
-  const swiper = useRef(null);
-  const contentSwiper = useRef(null);
+  const swiper = useRef<any>(null);
+  const contentSwiper = useRef<any>(null);
   const [week, setWeek] = useState(0);
   const [station, setStation] = useState<Station | null>(null);
   const [reservations, setReservations] = useState<Reservation[] | null>(null);

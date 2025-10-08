@@ -2,7 +2,7 @@ import api from "@/api/AuthAxios";
 import { apiUrl } from "@/context/AuthContext";
 import { ApiListResponse } from "@/interfaces/ApiListResponse";
 import { Station, StationRegister } from "@/interfaces/Station";
-import { getFilenameFromUri } from "@/utils/getFilenameFromUri";
+import { getFilenameFromUri } from "@/lib/getFilenameFromUri";
 
 export function getAllStations() {
   return api.get<ApiListResponse<Station>>(

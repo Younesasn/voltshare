@@ -12,7 +12,7 @@ import { User, UserRegister } from "@/interfaces/User";
 import dayjs from "dayjs";
 import "dayjs/locale/fr";
 import Toast from "react-native-toast-message";
-import { createRandomString } from "@/utils/createRandomString";
+import { createRandomString } from "@/lib/createRandomString";
 import api, { setOnTokenRefreshed } from "@/api/AuthAxios";
 dayjs.locale("fr");
 
