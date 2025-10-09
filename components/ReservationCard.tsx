@@ -133,7 +133,7 @@ export default function ReservationCard({
 }
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors["shady-50"],
+    backgroundColor: Colors["shady-200"],
     borderRadius: 16,
     padding: 14,
     shadowColor: Colors["shady-900"],
@@ -141,7 +141,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 6,
     elevation: 2,
-    marginHorizontal: 2,
     gap: 12,
   },
   row: {

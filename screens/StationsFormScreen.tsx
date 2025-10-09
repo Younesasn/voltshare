@@ -54,15 +54,6 @@ export default function StationsFormScreen() {
     defaultMessage: z
       .string()
       .min(1, "Le message envoyé par défaut est requis"),
-    // imageFile: z
-    //   .any()
-    //   .refine((files) => {
-    //     return files?.[0]?.size <= MAX_FILE_SIZE;
-    //   }, `La taille maximum est de 5MB.`)
-    //   .refine(
-    //     (files) => ACCEPTED_IMAGE_MIME_TYPES.includes(files?.[0]?.type),
-    //     "Seuls les fichiers de type .jpg, .jpeg, .png & .webp fsont supportés."
-    //   ),
   });
   type StationFormData = z.infer<typeof schema>;
   const {
@@ -99,6 +90,7 @@ export default function StationsFormScreen() {
     if (result.canceled) {
       return;
     }
+    console.log(result.assets[0]);
     setSelectedImage(result.assets[0]);
     setErrorImage(null);
   };
@@ -179,7 +171,20 @@ export default function StationsFormScreen() {
               </View>
               <View style={{ display: "flex", gap: 20 }}>
                 <View style={{ gap: 10 }}>
-                  <ThemedText>Nom de la borne</ThemedText>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <ThemedText>Nom de la borne</ThemedText>
+                    {errors.name && (
+                      <ThemedText style={styles.error}>
+                        {errors.name.message}
+                      </ThemedText>
+                    )}
+                  </View>
                   <Controller
                     control={control}
                     name="name"
@@ -194,15 +199,23 @@ export default function StationsFormScreen() {
                       />
                     )}
                   />
-                  {errors.name && (
-                    <ThemedText style={styles.error}>
-                      {errors.name.message}
-                    </ThemedText>
-                  )}
                 </View>
                 <View>
                   <View style={{ gap: 10 }}>
-                    <ThemedText>Adresse</ThemedText>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
+                    >
+                      <ThemedText>Adresse</ThemedText>
+                      {errors.adress && (
+                        <ThemedText style={styles.error}>
+                          {errors.adress.message}
+                        </ThemedText>
+                      )}
+                    </View>
                     <Controller
                       control={control}
                       name="adress"
@@ -220,11 +233,6 @@ export default function StationsFormScreen() {
                         />
                       )}
                     />
-                    {errors.adress && (
-                      <ThemedText style={styles.error}>
-                        {errors.adress.message}
-                      </ThemedText>
-                    )}
                   </View>
                   {searchResult && (
                     <FlatList
@@ -255,7 +263,20 @@ export default function StationsFormScreen() {
                   )}
                 </View>
                 <View style={{ gap: 10 }}>
-                  <ThemedText>Description</ThemedText>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <ThemedText>Description</ThemedText>
+                    {errors.description && (
+                      <ThemedText style={styles.error}>
+                        {errors.description.message}
+                      </ThemedText>
+                    )}
+                  </View>
                   <Controller
                     control={control}
                     name="description"
@@ -270,14 +291,22 @@ export default function StationsFormScreen() {
                       />
                     )}
                   />
-                  {errors.description && (
-                    <ThemedText style={styles.error}>
-                      {errors.description.message}
-                    </ThemedText>
-                  )}
                 </View>
                 <View style={{ gap: 10 }}>
-                  <ThemedText>Puissance de charge (kw)</ThemedText>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <ThemedText>Puissance de charge (kw)</ThemedText>
+                    {errors.power && (
+                      <ThemedText style={styles.error}>
+                        {errors.power.message}
+                      </ThemedText>
+                    )}
+                  </View>
                   <Controller
                     control={control}
                     name="power"
@@ -293,14 +322,22 @@ export default function StationsFormScreen() {
                       />
                     )}
                   />
-                  {errors.power && (
-                    <ThemedText style={styles.error}>
-                      {errors.power.message}
-                    </ThemedText>
-                  )}
                 </View>
                 <View style={{ gap: 10 }}>
-                  <ThemedText>Prix/h (€)</ThemedText>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <ThemedText>Prix/h (€)</ThemedText>
+                    {errors.price && (
+                      <ThemedText style={styles.error}>
+                        {errors.price.message}
+                      </ThemedText>
+                    )}
+                  </View>
                   <Controller
                     control={control}
                     name="price"
@@ -316,15 +353,23 @@ export default function StationsFormScreen() {
                       />
                     )}
                   />
-                  {errors.price && (
-                    <ThemedText style={styles.error}>
-                      {errors.price.message}
-                    </ThemedText>
-                  )}
                 </View>
                 <View style={{ gap: 14 }}>
                   <View style={{ gap: 4 }}>
-                    <ThemedText>Message par défaut</ThemedText>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
+                    >
+                      <ThemedText>Message par défaut</ThemedText>
+                      {errors.defaultMessage && (
+                        <ThemedText style={styles.error}>
+                          {errors.defaultMessage.message}
+                        </ThemedText>
+                      )}
+                    </View>
                     <ThemedText>
                       Ce message sera envoyé après avoir validé une réservation
                       auprès d'un client
@@ -344,11 +389,6 @@ export default function StationsFormScreen() {
                       />
                     )}
                   />
-                  {errors.defaultMessage && (
-                    <ThemedText style={styles.error}>
-                      {errors.defaultMessage.message}
-                    </ThemedText>
-                  )}
                 </View>
               </View>
             </View>
