@@ -97,7 +97,7 @@ api.interceptors.request.use(async (config: any) => {
   }
 
   // 2h59 = 10799s / à remplacer avant prod pour 59s
-  if (diffInSeconds > 10799) {
+  if (diffInSeconds > 59) {
     if (!isRefreshing) {
       isRefreshing = true;
       refreshTokenRequest(refreshToken);

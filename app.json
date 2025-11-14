@@ -78,6 +78,12 @@
     "experiments": {
       "typedRoutes": true
     },
-    "owner": "younesasn"
+    "owner": "younesasn",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1ee5ae21-c599-40a4-a374-3eb7d124f22d"
+      }
+    }
   }
 }
