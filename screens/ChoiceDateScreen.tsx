@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import moment from "moment";
-import Swiper from "react-native-swiper";
+import PagerView from "react-native-pager-view";
 import { Colors } from "@/themes/Colors";
 import { ThemedText } from "@/themes/ThemedText";
 import Button from "@/components/Button";
@@ -98,15 +98,18 @@ moment.updateLocale("fr", {
 export default function ChoiceDateScreen() {
   const { id } = useLocalSearchParams();
   const newId = parseInt(id as string);
-  const swiper = useRef<any>(null);
-  const contentSwiper = useRef<any>(null);
+  const weekPagerRef = useRef<PagerView>(null);
+  const dayPagerRef = useRef<PagerView>(null);
   const [week, setWeek] = useState(0);
   const [station, setStation] = useState<Station | null>(null);
   const [reservations, setReservations] = useState<Reservation[] | null>(null);
   const [value, setValue] = useState(new Date());
-  const [startSlot, setStartSlot] = useState<moment.Moment | null>(null);
-  const [endSlot, setEndSlot] = useState<moment.Moment | null>(null);
-  const [disabled, setDisabled] = useState<boolean>(true);
+  const [startSlotTime, setStartSlotTime] = useState<number | null>(null);
+  const [endSlotTime, setEndSlotTime] = useState<number | null>(null);
+
+  // Convertir les timestamps en objets moment pour l'affichage
+  const startSlot = startSlotTime ? moment(startSlotTime) : null;
+  const endSlot = endSlotTime ? moment(endSlotTime) : null;
 
   /**
    * Récupérer les réservations de la station
@@ -154,20 +157,13 @@ export default function ChoiceDateScreen() {
   /**
    * Réinitialise le créneau sélectionné
    */
-  const resetReservation = async () => {
-    setStartSlot(null);
-    setEndSlot(null);
+  const resetReservation = () => {
+    setStartSlotTime(null);
+    setEndSlotTime(null);
   };
 
-  /**
-   * Modifie l'état du bouton 'Continuer'
-   */
-  useEffect(() => {
-    setDisabled(true);
-    if (startSlot && endSlot) {
-      setDisabled(false);
-    }
-  }, [startSlot, endSlot]);
+  // Le bouton est désactivé si startSlot ou endSlot n'est pas défini
+  const isButtonDisabled = startSlotTime === null || endSlotTime === null;
 
   const checkout = async () => {
     await SecureStore.setItemAsync("station", JSON.stringify(station));
@@ -182,6 +178,52 @@ export default function ChoiceDateScreen() {
     router.navigate("/checkout");
   };
 
+  /**
+   * Gestion du changement de page pour le sélecteur de semaine
+   */
+  const onWeekPageSelected = useCallback(
+    (e: any) => {
+      const position = e.nativeEvent.position;
+      if (position === 1) {
+        return;
+      }
+
+      const index = position - 1;
+      setValue(moment(value).add(index, "week").toDate());
+
+      setTimeout(() => {
+        setWeek(week + index);
+        weekPagerRef.current?.setPageWithoutAnimation(1);
+      }, 10);
+    },
+    [value, week]
+  );
+
+  /**
+   * Gestion du changement de page pour le sélecteur de jour
+   */
+  const onDayPageSelected = useCallback(
+    (e: any) => {
+      const position = e.nativeEvent.position;
+      if (position === 1) {
+        return;
+      }
+
+      setTimeout(() => {
+        const nextValue = moment(value).add(position - 1, "days");
+
+        // Ajuste le sélecteur de semaine si nécessaire
+        if (moment(value).week() !== nextValue.week()) {
+          setWeek(moment(value).isBefore(nextValue) ? week + 1 : week - 1);
+        }
+
+        setValue(nextValue.toDate());
+        dayPagerRef.current?.setPageWithoutAnimation(1);
+      }, 10);
+    },
+    [value, week]
+  );
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -193,27 +235,14 @@ export default function ChoiceDateScreen() {
         </View>
 
         <View style={styles.picker}>
-          <Swiper
-            index={1}
-            ref={swiper}
-            loop={false}
-            showsPagination={false}
-            onIndexChanged={(id) => {
-              if (id === 1) {
-                return;
-              }
-
-              const index = id - 1;
-              setValue(moment(value).add(index, "week").toDate());
-
-              setTimeout(() => {
-                setWeek(week + index);
-                swiper.current?.scrollTo(1, false);
-              }, 10);
-            }}
+          <PagerView
+            ref={weekPagerRef}
+            style={{ flex: 1, height: 50 }}
+            initialPage={1}
+            onPageSelected={onWeekPageSelected}
           >
             {weeks.map((dates, index) => (
-              <View style={styles.itemRow} key={index}>
+              <View style={styles.itemRow} key={`week-${index}`} collapsable={false}>
                 {dates.map((item, dateIndex) => {
                   const isActive =
                     value.toDateString() === item.date.toDateString();
@@ -252,8 +281,9 @@ export default function ChoiceDateScreen() {
                 })}
               </View>
             ))}
-          </Swiper>
+          </PagerView>
         </View>
+
         <View style={{ paddingHorizontal: 16 }}>
           {/* Affiche le créneau sélectionné */}
           {startSlot && endSlot ? (
@@ -265,31 +295,11 @@ export default function ChoiceDateScreen() {
         </View>
 
         {/* Affiche les jours */}
-        <Swiper
-          index={1}
-          ref={contentSwiper}
-          loop={false}
-          showsPagination={false}
-          showsVerticalScrollIndicator={false}
-          onIndexChanged={(ind) => {
-            if (ind === 1) {
-              return;
-            }
-
-            setTimeout(() => {
-              const nextValue = moment(value).add(ind - 1, "days");
-
-              // Ajuste le sélecteur de semaine si nécessaire
-              if (moment(value).week() !== nextValue.week()) {
-                setWeek(
-                  moment(value).isBefore(nextValue) ? week + 1 : week - 1
-                );
-              }
-
-              setValue(nextValue.toDate());
-              contentSwiper.current?.scrollTo(1, false);
-            }, 10);
-          }}
+        <PagerView
+          ref={dayPagerRef}
+          style={{ flex: 1 }}
+          initialPage={1}
+          onPageSelected={onDayPageSelected}
         >
           {days.map((day, index) => {
             const formatHour = (n: number) => n.toString().padStart(2, "0");
@@ -301,8 +311,9 @@ export default function ChoiceDateScreen() {
 
             return (
               <View
-                key={index}
-                style={{ flex: 1, paddingHorizontal: 16, marginBottom: 16 }}
+                key={`day-${index}`}
+                style={{ flex: 1, paddingHorizontal: 16 }}
+                collapsable={false}
               >
                 <View
                   style={{
@@ -328,118 +339,113 @@ export default function ChoiceDateScreen() {
                     </TouchableOpacity>
                   ) : null}
                 </View>
-                <ScrollView style={{ height: 620 }}>
-                  <View
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <View style={{ gap: 10 }}>
-                      {hours.map((hour, index) => {
-                        const h = Number(hour);
-                        const nextHour = (h + 1) % 24;
+                <ScrollView
+                  style={{ flex: 1 }}
+                  contentContainerStyle={{ paddingBottom: 20 }}
+                  showsVerticalScrollIndicator={false}
+                >
+                  <View style={{ gap: 10 }}>
+                    {hours.map((hour, hourIndex) => {
+                      const h = Number(hour);
+                      const nextHour = (h + 1) % 24;
 
-                        // ✅ On construit une plage horaire correspondant à ce créneau
-                        const slotStart = moment(day)
-                          .hour(h)
-                          .minute(0)
-                          .second(0);
-                        const slotEnd = moment(day).hour(nextHour);
+                      // ✅ On construit une plage horaire correspondant à ce créneau
+                      const slotStart = moment(day)
+                        .hour(h)
+                        .minute(0)
+                        .second(0);
+                      const slotEnd = moment(day).hour(nextHour);
 
-                        // ⛔ Est-ce qu'un créneau de reservation chevauche celui-ci ?
-                        const isTaken = dayReservations?.some((res) => {
-                          const resStart = moment(res.startTime);
-                          const resEnd = moment(res.endTime);
-                          return (
-                            slotStart.isBefore(resEnd) &&
-                            slotEnd.isAfter(resStart)
-                          );
-                        });
-
-                        // ✅ On vérifie si le créneau est sélectionné
-                        const isSelected =
-                          (startSlot &&
-                            !endSlot &&
-                            slotStart.isSame(startSlot)) ||
-                          (startSlot &&
-                            endSlot &&
-                            slotStart.isSameOrAfter(startSlot) &&
-                            slotStart.isBefore(moment(endSlot).add(1, "hour")));
-
+                      // ⛔ Est-ce qu'un créneau de reservation chevauche celui-ci ?
+                      const isTaken = dayReservations?.some((res) => {
+                        const resStart = moment(res.startTime);
+                        const resEnd = moment(res.endTime);
                         return (
-                          <TouchableOpacity
-                            key={index}
-                            style={[
-                              isTaken || moment(slotStart).isBefore(moment())
-                                ? styles.hourButtonDisabled
-                                : isSelected
-                                  ? styles.hourButtonSelected
-                                  : styles.hourButton,
-                            ]}
-                            disabled={
-                              isTaken || moment(slotStart).isBefore(moment())
-                            }
-                            onPress={() => {
-                              if (!startSlot) {
-                                setStartSlot(slotStart); // Premier clic = heure de début
-                              } else if (!endSlot) {
-                                if (slotStart.isBefore(startSlot)) {
-                                  // Si clic avant startSlot → on inverse intelligemment
-                                  setEndSlot(startSlot);
-                                  setStartSlot(slotStart);
-                                } else {
-                                  setEndSlot(slotStart); // Deuxième clic = heure de fin
-                                }
-                              } else {
-                                // Si les deux sont déjà définis → on reset tout
-                                setStartSlot(slotStart);
-                                setEndSlot(null);
-                              }
-                            }}
-                          >
-                            <ThemedText
-                              color={
-                                isTaken || moment(slotStart).isBefore(moment())
-                                  ? Colors["shady-950"]
-                                  : isSelected
-                                    ? Colors["shady-50"]
-                                    : Colors["shady-950"]
-                              }
-                            >
-                              {isTaken || moment(slotStart).isBefore(moment())
-                                ? "Indisponible"
-                                : "Disponible"}
-                            </ThemedText>
-                            <ThemedText
-                              color={
-                                isTaken || moment(slotStart).isBefore(moment())
-                                  ? Colors["shady-950"]
-                                  : isSelected
-                                    ? Colors["shady-50"]
-                                    : Colors["shady-950"]
-                              }
-                            >
-                              {isTaken || moment(slotStart).isBefore(moment())
-                                ? ""
-                                : `De ${formatHour(h)}h à ${formatHour(nextHour)}h`}
-                            </ThemedText>
-                          </TouchableOpacity>
+                          slotStart.isBefore(resEnd) &&
+                          slotEnd.isAfter(resStart)
                         );
-                      })}
-                    </View>
+                      });
+
+                      // ✅ On vérifie si le créneau est sélectionné
+                      const slotTime = slotStart.valueOf();
+                      const isSelected =
+                        (startSlotTime !== null &&
+                          endSlotTime === null &&
+                          slotTime === startSlotTime) ||
+                        (startSlotTime !== null &&
+                          endSlotTime !== null &&
+                          slotTime >= startSlotTime &&
+                          slotTime <= endSlotTime);
+
+                      return (
+                        <TouchableOpacity
+                          key={hourIndex}
+                          style={[
+                            isTaken || moment(slotStart).isBefore(moment())
+                              ? styles.hourButtonDisabled
+                              : isSelected
+                                ? styles.hourButtonSelected
+                                : styles.hourButton,
+                          ]}
+                          disabled={
+                            isTaken || moment(slotStart).isBefore(moment())
+                          }
+                          onPress={() => {
+                            if (!startSlotTime) {
+                              setStartSlotTime(slotStart.valueOf()); // Premier clic = heure de début
+                            } else if (!endSlotTime) {
+                              if (slotStart.valueOf() < startSlotTime) {
+                                // Si clic avant startSlot → on inverse intelligemment
+                                setEndSlotTime(startSlotTime);
+                                setStartSlotTime(slotStart.valueOf());
+                              } else {
+                                setEndSlotTime(slotStart.valueOf()); // Deuxième clic = heure de fin
+                              }
+                            } else {
+                              // Si les deux sont déjà définis → on reset tout
+                              setStartSlotTime(slotStart.valueOf());
+                              setEndSlotTime(null);
+                            }
+                          }}
+                        >
+                          <ThemedText
+                            color={
+                              isTaken || moment(slotStart).isBefore(moment())
+                                ? Colors["shady-950"]
+                                : isSelected
+                                  ? Colors["shady-50"]
+                                  : Colors["shady-950"]
+                            }
+                          >
+                            {isTaken || moment(slotStart).isBefore(moment())
+                              ? "Indisponible"
+                              : "Disponible"}
+                          </ThemedText>
+                          <ThemedText
+                            color={
+                              isTaken || moment(slotStart).isBefore(moment())
+                                ? Colors["shady-950"]
+                                : isSelected
+                                  ? Colors["shady-50"]
+                                  : Colors["shady-950"]
+                            }
+                          >
+                            {isTaken || moment(slotStart).isBefore(moment())
+                              ? ""
+                              : `De ${formatHour(h)}h à ${formatHour(nextHour)}h`}
+                          </ThemedText>
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
                 </ScrollView>
               </View>
             );
           })}
-        </Swiper>
+        </PagerView>
 
-        <View style={{ paddingHorizontal: 16 }}>
-          <Button title="Continuer" onPress={checkout} disabled={disabled} />
+        <View style={{ paddingHorizontal: 16, paddingVertical: 16 }}>
+          <Button title="Continuer" onPress={checkout} disabled={isButtonDisabled} />
         </View>
       </View>
     </SafeAreaView>
@@ -457,11 +463,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   picker: {
-    flex: 1,
-    maxHeight: 74,
+    height: 74,
     paddingVertical: 12,
-    flexDirection: "row",
-    alignItems: "center",
   },
   /** Item */
   item: {
@@ -494,16 +497,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     color: "#111",
-  },
-  /** Placeholder */
-  placeholder: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-    height: 400,
-    marginTop: 0,
-    padding: 0,
-    backgroundColor: "transparent",
   },
   /** Button */
   hourButton: {
@@ -548,14 +541,5 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     fontWeight: "600",
     color: "#fff",
-  },
-  back: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    borderRadius: 20,
-    marginBottom: 10,
-    paddingHorizontal: 16,
   },
 });
