@@ -21,11 +21,13 @@ import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useStations } from "@/context/StationContext";
+import { useAuth } from "@/context/AuthContext";
 import { getPosition } from "@/lib/getPosition";
 import { GlassView } from "expo-glass-effect";
 
 export function Map() {
   const { stations, loading, refreshStations } = useStations();
+  const { authState } = useAuth();
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
   );
@@ -103,9 +105,20 @@ export function Map() {
   };
 
   useEffect(() => {
-    refreshStations();
     getLocation();
   }, []);
+
+  useEffect(() => {
+    // Charger les stations automatiquement quand l'utilisateur se connecte
+    // ou si l'utilisateur est déjà connecté au montage
+    console.log("🗺️ Map useEffect - authState:", authState?.authenticated);
+    if (authState && authState.authenticated === true) {
+      console.log("✅ Utilisateur authentifié, chargement des stations...");
+      refreshStations();
+    } else {
+      console.log("❌ Utilisateur non authentifié ou en cours de chargement");
+    }
+  }, [authState?.authenticated, refreshStations]);
 
   return (
     <View style={{ flex: 1 }}>

@@ -29,4 +29,7 @@ export interface StationRegister {
   imageFile?: any
   defaultMessage: string
   description: string
+  user?: string
+  picture?: string
+  type?: string
 }

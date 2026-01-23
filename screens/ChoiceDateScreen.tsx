@@ -3,12 +3,12 @@ import {
   StyleSheet,
   Dimensions,
   TouchableWithoutFeedback,
-  SafeAreaView,
   View,
   Text,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import moment from "moment";
 import PagerView from "react-native-pager-view";
 import { Colors } from "@/themes/Colors";
@@ -189,7 +189,15 @@ export default function ChoiceDateScreen() {
       }
 
       const index = position - 1;
-      setValue(moment(value).add(index, "week").toDate());
+      const newDate = moment(value).add(index, "week");
+
+      // Empêcher de naviguer vers le passé
+      if (newDate.isBefore(moment(), "day")) {
+        weekPagerRef.current?.setPageWithoutAnimation(1);
+        return;
+      }
+
+      setValue(newDate.toDate());
 
       setTimeout(() => {
         setWeek(week + index);
@@ -209,9 +217,15 @@ export default function ChoiceDateScreen() {
         return;
       }
 
-      setTimeout(() => {
-        const nextValue = moment(value).add(position - 1, "days");
+      const nextValue = moment(value).add(position - 1, "days");
 
+      // Empêcher de naviguer vers le passé
+      if (nextValue.isBefore(moment(), "day")) {
+        dayPagerRef.current?.setPageWithoutAnimation(1);
+        return;
+      }
+
+      setTimeout(() => {
         // Ajuste le sélecteur de semaine si nécessaire
         if (moment(value).week() !== nextValue.week()) {
           setWeek(moment(value).isBefore(nextValue) ? week + 1 : week - 1);
@@ -246,16 +260,25 @@ export default function ChoiceDateScreen() {
                 {dates.map((item, dateIndex) => {
                   const isActive =
                     value.toDateString() === item.date.toDateString();
+                  const isPast = moment(item.date).isBefore(moment(), "day");
                   return (
                     <TouchableWithoutFeedback
                       key={dateIndex}
-                      onPress={() => setValue(item.date)}
+                      onPress={() => {
+                        if (!isPast) {
+                          setValue(item.date);
+                        }
+                      }}
+                      disabled={isPast}
                     >
                       <View
                         style={[
                           styles.item,
                           isActive && {
                             backgroundColor: Colors["shady-950"],
+                          },
+                          isPast && {
+                            opacity: 0.4,
                           },
                         ]}
                       >
