@@ -180,21 +180,30 @@ export default function ConversationScreen() {
               return (
                 <View
                   style={{
-                    alignSelf: isMe ? "flex-end" : "flex-start",
-                    backgroundColor: isMe
-                      ? Colors["shady-300"]
-                      : Colors["shady-200"],
-                    borderRadius: 12,
-                    padding: 10,
+                    flexDirection: 'row',
+                    justifyContent: isMe ? 'flex-end' : 'flex-start',
                     marginBottom: 20,
                   }}
                 >
-                  <ThemedText>{item.content}</ThemedText>
-                  <ThemedText
-                    style={{ fontSize: 10, color: "#888", marginTop: 4 }}
+                  <View
+                    style={{
+                      maxWidth: '80%',
+                      backgroundColor: isMe
+                        ? Colors["shady-300"]
+                        : Colors["shady-200"],
+                      borderRadius: 12,
+                      padding: 10,
+                      marginLeft: isMe ? 40 : 0,          // Ajoute une marge du côté opposé pour espacer le message du bord
+                      marginRight: isMe ? 0 : 40,         // Idem pour l'autre côté
+                    }}
                   >
-                    {moment(parseSendAt(item.sendAt)).format("HH:mm")}
-                  </ThemedText>
+                    <ThemedText>{item.content}</ThemedText>
+                    <ThemedText
+                      style={{ fontSize: 10, color: "#888", marginTop: 4 }}
+                    >
+                      {moment(parseSendAt(item.sendAt)).format("HH:mm")}
+                    </ThemedText>
+                  </View>
                 </View>
               );
             }}
@@ -239,7 +248,7 @@ export default function ConversationScreen() {
                         onPress={handleSubmit(send)}
                       >
                         <AntDesign
-                          name="arrowup"
+                          name="arrow-up"
                           size={22}
                           color={Colors["shady-50"]}
                         />
