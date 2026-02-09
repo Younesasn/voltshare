@@ -2,7 +2,7 @@ import { ThemedText } from "@/themes/ThemedText";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as SecureStore from "expo-secure-store";
-import { Image, StyleSheet, View } from "react-native";
+import { Alert, Image, StyleSheet, View } from "react-native";
 import { Station } from "@/interfaces/Station";
 import { useAuth } from "@/context/AuthContext";
 import { useReservationRefresh } from "@/hooks/useReservationRefresh";
@@ -60,6 +60,15 @@ export default function Checkout() {
         return;
       }
 
+      // Vérifier qu'un véhicule est bien sélectionné avant de passer au paiement Stripe
+      if (!user.cars || !user.cars[0] || !user.cars[0].id) {
+        Alert.alert(
+          "Véhicule requis",
+          "Vous devez ajouter un véhicule dans votre compte avant de pouvoir payer."
+        );
+        return;
+      }
+
       const res = await createSession({
         user: user,
         product_name: station.name,
@@ -81,7 +90,6 @@ export default function Checkout() {
 
       if (result.type === "success") {
         if (
-          !user?.cars?.[0]?.id ||
           !startSlot ||
           !endSlot ||
           !station?.["@id"]
